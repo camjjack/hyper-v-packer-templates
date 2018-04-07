@@ -1,0 +1,50 @@
+{
+    "variables": {
+      "vm_name": "ubuntu-xenial-desktop",
+      "cpu": "2",
+      "ram_size": "2048",
+      "hyperv_switchname": "{{env `hyperv_switchname`}}",
+      "username" : "vagrant",
+      "password" : "vagrant",
+      "output_directory": "./output-ubuntu-16.04-desktop/",
+      "input_directory": "./output-ubuntu-16.04/",
+      "output_name": "ubuntu-xenial-desktop",
+      "box_out_dir": "./dist/"
+    },
+    "builders": [
+    {
+        "type": "hyperv-vmcx",
+        "vm_name":"{{user `vm_name`}}",
+        "clone_from_vmxc_path": "{{user `input_directory`}}",
+        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+        "ssh_password": "{{user `password`}}",
+        "ssh_username": "{{user `username`}}",
+        "ram_size": "{{user `ram_size`}}",
+        "cpu": "{{user `cpu`}}",
+        "switch_name":"{{user `hyperv_switchname`}}",
+        "enable_secure_boot":false,
+        "output_directory": "{{user `output_directory`}}"
+    }],
+    "provisioners": [{
+        "environment_vars": [
+          "SSH_USERNAME={{user `username`}}"
+        ],    
+        "type": "shell",
+        "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+        "scripts": [
+            "./scripts/update.sh",
+            "./scripts/desktop.sh",
+            "./scripts/cleanup.sh"
+        ],
+        "expect_disconnect": true
+    }
+    ],
+    "post-processors": [
+        {
+        "type": "vagrant",
+        "keep_input_artifact": true,
+        "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box"
+        }
+    ]
+    
+}
