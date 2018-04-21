@@ -65,6 +65,51 @@
     "switch_name":"{{user `hyperv_switchname`}}",
     "enable_secure_boot":false,
     "output_directory": "{{user `output_directory`}}"
+  },
+  {
+    "vm_name":"{{user `vm_name`}}",
+    "type": "virtualbox-iso",
+    "disk_size": "{{user `disk_size`}}",
+    "guest_additions_mode":"disable",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_checksum_url": "{{ user `iso_checksum_url` }}",
+    "communicator":"ssh",
+    "ssh_username": "{{user `username`}}",
+    "ssh_password": "{{user `password`}}",	
+    "ssh_timeout" : "4h",
+    "boot_wait": "5s",
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--memory", "{{user `ram_size`}}"],
+      ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpu`}}"]
+    ],
+    "boot_command": [
+      "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+      "{{user `vmlinuz`}} noapic",
+      "auto ",
+      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+      "debian-installer={{user `locale`}} ",
+      "locale={{user `locale`}} ",
+      "hostname={{.Name}} ",
+      "fb=false ",
+      "debconf/frontend=noninteractive ",
+      "passwd/user-fullname={{user `username`}} ",
+      "passwd/username={{user `username`}} ",
+      "passwd/user-password={{user `password`}} ",
+      "passwd/user-password-again={{user `password`}} ",
+      "console-setup/ask_detect=false ",
+      "keymap={{user `keyboard_variant`}} ",
+      "kbd-chooser/method={{user `keyboard_variant`}} ",
+      "keyboard-configuration/layout={{user `keyboard_layout`}} ",
+      "keyboard-configuration/variant={{user `keyboard_layout`}} ",
+      "tasksel=ubuntu-desktop ",
+      "initrd={{user `initrd`}}<enter>"
+    ],
+    "http_directory": "preseed",
+    "guest_os_type": "Ubuntu_64",
+    "shutdown_command": "echo '{{user `username`}}' | sudo -S -E shutdown -P now",
+    "shutdown_timeout": "10m",
+    "output_directory": "{{user `output_directory`}}"
   }],
   "provisioners": [{
     "environment_vars": [
@@ -74,7 +119,8 @@
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
     "scripts": [
       "./scripts/update.sh",
-      "./scripts/vagrant.sh"
+      "./scripts/vagrant.sh",
+      "./scripts/disable-daily-update.sh"
     ],
     "expect_disconnect": true
   },{
@@ -94,6 +140,13 @@
       "./scripts/hyperv-gen2.sh"
     ],
     "only": ["hyperv-iso"]
+  },{    
+    "type": "shell",
+    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+    "scripts": [
+      "./scripts/virtualbox.sh"
+    ],
+    "only": ["virtualbox-iso"]
   },{
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",

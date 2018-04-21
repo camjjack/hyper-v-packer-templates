@@ -8,6 +8,7 @@
       "password" : "vagrant",
       "output_directory": "./output-ubuntu-16.04-desktop/",
       "input_directory": "./output-ubuntu-16.04/",
+      "input_name": "ubuntu-xenial",
       "output_name": "ubuntu-xenial-desktop",
       "box_out_dir": "./dist/"
     },
@@ -23,6 +24,20 @@
         "cpu": "{{user `cpu`}}",
         "switch_name":"{{user `hyperv_switchname`}}",
         "enable_secure_boot":false,
+        "output_directory": "{{user `output_directory`}}"
+    },
+    {
+        "type": "virtualbox-ovf",
+        "source_path": "{{user `input_directory`}}/{{user `input_name`}}.ovf",
+        "vm_name":"{{user `vm_name`}}",
+        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+        "ssh_password": "{{user `password`}}",
+        "ssh_username": "{{user `username`}}",
+        "vboxmanage": [
+            ["modifyvm", "{{.Name}}", "--memory", "{{user `ram_size`}}"],
+            ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpu`}}"]
+        ],
+        "shutdown_timeout": "10m",
         "output_directory": "{{user `output_directory`}}"
     }],
     "provisioners": [{
