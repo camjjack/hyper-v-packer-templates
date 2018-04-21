@@ -84,7 +84,8 @@ $vagrant_add_args += 'add'
 
 if($Clean -or $force) {
     Write-Output -InputObject "Removing existing box files"
-    Remove-Item -Path '*.box' -Force
+    $output_boxs = '{0}/*{1}*.box' -f $box_out_dir, $vmNamePrefix
+    Get-ChildItem $output_boxs -Recurse | Remove-Item -Recurse -Force
     Write-Output -InputObject "Removing existing build artivacts"
     $output_dirs = '{0}*' -f $outputNamePrefix
     Get-ChildItem $output_dirs -Recurse | Remove-Item -Recurse -Force
