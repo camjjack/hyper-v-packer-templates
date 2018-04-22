@@ -70,7 +70,6 @@
     "vm_name":"{{user `vm_name`}}",
     "type": "virtualbox-iso",
     "disk_size": "{{user `disk_size`}}",
-    "guest_additions_mode":"disable",
     "iso_url": "{{user `iso_url`}}",
     "iso_checksum_type": "{{user `iso_checksum_type`}}",
     "iso_checksum_url": "{{ user `iso_checksum_url` }}",
@@ -111,7 +110,14 @@
     "shutdown_timeout": "10m",
     "output_directory": "{{user `output_directory`}}"
   }],
-  "provisioners": [{
+  "provisioners": [{    
+    "type": "shell",
+    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+    "scripts": [
+      "./scripts/virtualbox.sh"
+    ],
+    "only": ["virtualbox-iso"]
+  },{
     "environment_vars": [
       "SSH_USERNAME={{user `username`}}"
     ],    
@@ -123,6 +129,13 @@
       "./scripts/disable-daily-update.sh"
     ],
     "expect_disconnect": true
+  },{    
+    "type": "shell",
+    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+    "scripts": [
+      "./scripts/hyperv-gen2.sh"
+    ],
+    "only": ["hyperv-iso"]
   },{
     "environment_vars": [
       "LOCALE={{user `locale`}}"
@@ -133,20 +146,6 @@
       "./scripts/fix-locale.sh"
     ],
     "expect_disconnect": true
-  },{    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/hyperv-gen2.sh"
-    ],
-    "only": ["hyperv-iso"]
-  },{    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/virtualbox.sh"
-    ],
-    "only": ["virtualbox-iso"]
   },{
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
