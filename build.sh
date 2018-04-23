@@ -110,8 +110,9 @@ fi
 desktop_box_location="$box_out_dir/hyperv-$vm_name_prefix-desktop.box"
 if [ ! -f $desktop_box_location ]; then
     echo "Building desktop image"
-    desktop_args=("-var \"vm_name=$vm_name_prefix\"")
+    desktop_args=("-var \"vm_name=$vm_name_prefix-desktop\"")
     desktop_args+=("-var \"output_name=$desktop_vm_name\"")
+    desktop_args+=("-var \"input_name=$vm_name_prefix\"")
     desktop_args+=("-var \"output_directory=$desktop_out_location\"")
     desktop_args+=("-var \"input_directory=$base_out_location\"")
     args=("packer")
