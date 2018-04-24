@@ -1,0 +1,65 @@
+{
+  "variables": {
+    "vm_name": "windows-10",
+    "cpu": "2",
+    "ram_size": "2048",
+    "disk_size": "200000",
+    "iso_url": "http://care.dlservice.microsoft.com/dl/download/6/5/D/65D18931-F626-4A35-AD5B-F5DA41FE6B76/16299.15.170928-1534.rs3_release_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+    "iso_checksum_type": "sha1",
+    "iso_checksum": "3b5f9494d870726d6d8a833aaf6169a964b8a9be",
+    "hyperv_switchname": "{{env `hyperv_switchname`}}",
+    "username" : "vagrant",
+    "password" : "vagrant",
+    "output_directory": "./output-windows-10/",
+    "box_out_dir": "./dist/"
+  },
+  "builders": [
+  {
+    "vm_name":"{{user `vm_name`}}",
+    "type": "hyperv-iso",
+    "disk_size": "{{user `disk_size`}}",
+    "guest_additions_mode":"disable",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_checksum": "{{ user `iso_checksum` }}",
+    "communicator":"winrm",
+    "winrm_username": "{{user `username`}}",
+    "winrm_password": "{{user `password`}}",
+    "winrm_timeout" : "4h",
+    "shutdown_command": "shutdown /s /f /t 0",
+    "ram_size": "{{user `ram_size`}}",
+    "cpu": "{{user `cpu`}}",
+    "generation": 2,
+    "boot_wait": "0s",
+    "boot_command": [
+      "<enter><wait><enter>"
+    ],
+    "switch_name":"{{user `hyperv_switchname`}}",
+    "enable_secure_boot":true,
+    "output_directory": "{{user `output_directory`}}",
+    "secondary_iso_images": [
+      "./windows/iso/floppy.iso"
+    ]
+  }],
+  "provisioners": [{
+    "environment_vars": [
+      "SSH_USERNAME={{user `username`}}"
+    ],    
+    "type": "powershell",
+    "elevated_user": "{{user `username`}}",
+    "elevated_password": "{{user `password`}}",
+    "scripts": [
+      "./windows/scripts/install-chocolatey.ps1",
+      "./windows/scripts/compile-dotnet-assemblies.ps1",
+      "./windows/scripts/defrag.ps1",
+      "./windows/scripts/scrub.ps1"
+    ]
+  }],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true,
+      "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box"
+    }
+  ]
+}
