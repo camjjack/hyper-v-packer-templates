@@ -40,7 +40,8 @@ param([string]$outputNamePrefix = "output-ubuntu-16.04",
       [switch]$dontBuildDesktop = $false,
       [switch]$clean = $false,
       [switch]$force = $false,
-      [switch]$debug = $false)
+      [switch]$debug = $false,
+      [switch]$vagrantAdd = $false)
 
 #### Configuration
 $packer_exe = 'packer.exe'
