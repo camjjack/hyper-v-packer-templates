@@ -24,7 +24,7 @@
 .PARAMETER clean
     Cleans up all the artifacts of the build process.
 .PARAMETER force
-    Defatult behaivor is to skip any step that had been successfully completed before. Force will ensure all steps are run. Internally this
+    Default behaivor is to skip any step that had been successfully completed before. Force will ensure all steps are run. Internally this
     is achieved by performing a clean before building.
 .PARAMETER debug
     Causes packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight.
