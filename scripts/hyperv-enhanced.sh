@@ -12,7 +12,7 @@ apt-get install -y git
 
 # Clone the initialisation repo
 git clone https://github.com/jterry75/xrdp-init.git ~/xrdp-init
-pushd ~/xrdp-init/ubuntu/16.04/
+pushd ~/xrdp-init/ubuntu/18.04/
 
 # Set the scripts to be executable
 chmod +x install.sh

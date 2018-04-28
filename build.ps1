@@ -27,12 +27,14 @@
     Defatult behaivor is to skip any step that had been successfully completed before. Force will ensure all steps are run. Internally this
     is achieved by performing a clean before building.
 .PARAMETER debug
-    Causes packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight.
+    Causes packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight. Also turns of verbose logging.
+.PARAMETER verbose
+    Causes packer to be run with logging. Log will be written to 'packer-log.txt'
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
-param([string]$outputNamePrefix = "output-ubuntu-16.04",
-      [string]$vmNamePrefix = "ubuntu-16.04",
+param([string]$outputNamePrefix = "output-ubuntu-18.04",
+      [string]$vmNamePrefix = "ubuntu-18.04",
       [string]$cpus = "2",
       [string]$ramSize = "4096",
       [string]$diskSize = "200000",
@@ -41,15 +43,17 @@ param([string]$outputNamePrefix = "output-ubuntu-16.04",
       [switch]$clean = $false,
       [switch]$force = $false,
       [switch]$debug = $false,
+      [switch]$verbose = $false,
       [switch]$vagrantAdd = $false)
 
 #### Configuration
 $packer_exe = 'packer.exe'
 $vagrant_exe = 'vagrant.exe'
-$base_json = './hyperv-ubuntu-16.04.json'
-$desktop_json = './hyperv-ubuntu-16.04-desktop.json'
-$enhanced_json = './hyperv-ubuntu-16.04-enhanced.json'
+$base_json = './ubuntu.json'
+$desktop_json = './ubuntu-desktop.json'
+$enhanced_json = './ubuntu-enhanced.json'
 $box_out_dir = './dist/'
+$vars = './ubuntu-18.04'
 
 # Vm names and locations based on the prefixes given as a parameter.
 $base_out_location = './{0}/' -f $outputNamePrefix
@@ -75,8 +79,10 @@ $base_args += '-var "box_out_dir={0}"' -f $box_out_dir
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'
+}
+if ($debug -or $verbose) {
     $env:PACKER_LOG=1
-    $env:PACKER_LOG_PATH=packer-log.txt
+    $env:PACKER_LOG_PATH='packer-log.txt'
 }
 
 # base parameter arguments to be used for all vagrant add commands
