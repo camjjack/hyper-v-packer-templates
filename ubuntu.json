@@ -137,16 +137,6 @@
     ],
     "only": ["hyperv-iso"]
   },{
-    "environment_vars": [
-      "LOCALE={{user `locale`}}"
-    ],    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/fix-locale.sh"
-    ],
-    "expect_disconnect": true
-  },{
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
     "scripts": [

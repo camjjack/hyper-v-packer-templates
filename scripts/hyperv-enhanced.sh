@@ -11,6 +11,7 @@ fi
 apt-get install -y git
 
 # Clone the initialisation repo
+echo "==> Cloning xrpd-init"
 git clone https://github.com/jterry75/xrdp-init.git ~/xrdp-init
 pushd ~/xrdp-init/ubuntu/18.04/
 

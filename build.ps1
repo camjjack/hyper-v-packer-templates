@@ -53,7 +53,6 @@ $base_json = './ubuntu.json'
 $desktop_json = './ubuntu-desktop.json'
 $enhanced_json = './ubuntu-enhanced.json'
 $box_out_dir = './dist/'
-$vars = './ubuntu-18.04'
 
 # Vm names and locations based on the prefixes given as a parameter.
 $base_out_location = './{0}/' -f $outputNamePrefix
@@ -108,6 +107,7 @@ if (-not (Test-Path $base_box_location)) {
     $server_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_directory={0}"' -f $base_out_location
+    $server_args += '--only=hyperv-iso'
 
     $server_args += $base_args
     $server_args += $base_json
@@ -147,6 +147,7 @@ if (-not (Test-Path $desktop_box_location)) {
     $desktop_args += '-var "output_name={0}"' -f $desktop_vm_name
     $desktop_args += '-var "output_directory={0}"' -f $desktop_out_location
     $desktop_args += '-var "input_directory={0}"' -f $base_out_location
+    $desktop_args += '--only=hyperv-vmcx'
     $desktop_args += $base_args
     $desktop_args += $desktop_json
 
@@ -178,8 +179,8 @@ if ($version.Major -ilt 10 -or $version.Build -ilt 17063) {
 }
 
 if (-not (Test-Path $enhanced_box_location)) {
-    $hvsocket_path = 'output-{0}-desktop-hvsocket' -f $vmNamePrefix
-    if (-not (Test-Path $hvsocket_path)) {
+    $input_dir = Join-Path -Path $desktop_hvsocket_out_location -ChildPath $enhanced_vm_name
+    if (-not (Test-Path $input_dir)) {
         Write-Output -InputObject "Changing desktop vm to use hvsocket for enhanced session transport"
         & "./setup-enhanced-transport-type.ps1" -Path $desktop_out_location -OutPath $desktop_hvsocket_out_location -VmName $vmNamePrefix -OutVmName $enhanced_vm_name
         if (-not $?) {
@@ -193,8 +194,8 @@ if (-not (Test-Path $enhanced_box_location)) {
     $enhanced_args += '-var "vm_name={0}"' -f $enhanced_vm_name
     $enhanced_args += '-var "output_name={0}"' -f $enhanced_vm_name
     $enhanced_args += '-var "output_directory={0}"' -f $enhanced_out_location
-    $input_dir = Join-Path -Path $desktop_hvsocket_out_location -ChildPath $enhanced_vm_name
     $enhanced_args += '-var "input_directory={0}"' -f $input_dir
+    $enhanced_args += '--only=hyperv-vmcx'
     $enhanced_args += $base_args
     $enhanced_args += $enhanced_json
 
