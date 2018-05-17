@@ -8,7 +8,7 @@ if [ $? -ge 1 ]; then
 fi
 
 # install.sh needed to reboot half way through. Thats happened now so kick it off again
-pushd ~/xrdp-init/ubuntu/16.04/
+pushd ~/xrdp-init/ubuntu/18.04/
 
 echo "==> Running xrpd-init install again."
 ./install.sh

@@ -17,6 +17,8 @@ So the goals for this project are simple:
     1. Windows 10 build 17063 or greater is required for enhanced mode support. See https://blogs.technet.microsoft.com/virtualization/2018/02/28/sneak-peek-taking-a-spin-with-enhanced-linux-vms/
 
 ## Usage
+
+### Ubuntu 18.04 x64
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
@@ -30,8 +32,22 @@ A default build can be run like this:
 .\build.ps1
 ```
 
+### Windows 10 x64
+A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
+
+From a PowerShell command prompt in the project root:
+```
+get-help .\build-windows.ps1 -detailed
+```
+This will show all the configuration options available. 
+
+A default build can be run like this:
+```
+.\build-windows.ps1
+```
+
 ## Supported packer boxes
-In keeping with my project goals above, Ubuntu 16.04 x64 is the only supported box OS at this stage.
+In keeping with my project goals above, Ubuntu 18.04 x64 and Windows 10 x64 are the only supported box OS's at this stage.
 
 ## Troubleshooting
 The build script has a -debug option which sets some packer options to aid in debugging faulty templates. Start with the generated log file: packer-log.txt

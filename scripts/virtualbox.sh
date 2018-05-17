@@ -1,7 +1,5 @@
 #!/bin/dash -ex
 
-SSH_USER=${SSH_USERNAME:-vagrant}
-
 echo "==> Installing VirtualBox guest additions"
 apt-get install -y linux-headers-$(uname -r) build-essential perl
 apt-get install -y dkms

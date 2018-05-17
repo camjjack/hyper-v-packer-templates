@@ -27,12 +27,14 @@
     Defatult behaivor is to skip any step that had been successfully completed before. Force will ensure all steps are run. Internally this
     is achieved by performing a clean before building.
 .PARAMETER debug
-    Causes packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight.
+    Causes packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight. Also turns of verbose logging.
+.PARAMETER verbose
+    Causes packer to be run with logging. Log will be written to 'packer-log.txt'
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
-param([string]$outputNamePrefix = "output-ubuntu-16.04",
-      [string]$vmNamePrefix = "ubuntu-16.04",
+param([string]$outputNamePrefix = "output-ubuntu-18.04",
+      [string]$vmNamePrefix = "ubuntu-18.04",
       [string]$cpus = "2",
       [string]$ramSize = "4096",
       [string]$diskSize = "200000",
@@ -41,14 +43,15 @@ param([string]$outputNamePrefix = "output-ubuntu-16.04",
       [switch]$clean = $false,
       [switch]$force = $false,
       [switch]$debug = $false,
+      [switch]$verbose = $false,
       [switch]$vagrantAdd = $false)
 
 #### Configuration
 $packer_exe = 'packer.exe'
 $vagrant_exe = 'vagrant.exe'
-$base_json = './hyperv-ubuntu-16.04.json'
-$desktop_json = './hyperv-ubuntu-16.04-desktop.json'
-$enhanced_json = './hyperv-ubuntu-16.04-enhanced.json'
+$base_json = './ubuntu.json'
+$desktop_json = './ubuntu-desktop.json'
+$enhanced_json = './ubuntu-enhanced.json'
 $box_out_dir = './dist/'
 
 # Vm names and locations based on the prefixes given as a parameter.
@@ -75,8 +78,10 @@ $base_args += '-var "box_out_dir={0}"' -f $box_out_dir
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'
+}
+if ($debug -or $verbose) {
     $env:PACKER_LOG=1
-    $env:PACKER_LOG_PATH=packer-log.txt
+    $env:PACKER_LOG_PATH='packer-log.txt'
 }
 
 # base parameter arguments to be used for all vagrant add commands
@@ -102,6 +107,7 @@ if (-not (Test-Path $base_box_location)) {
     $server_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_directory={0}"' -f $base_out_location
+    $server_args += '--only=hyperv-iso'
 
     $server_args += $base_args
     $server_args += $base_json
@@ -141,6 +147,7 @@ if (-not (Test-Path $desktop_box_location)) {
     $desktop_args += '-var "output_name={0}"' -f $desktop_vm_name
     $desktop_args += '-var "output_directory={0}"' -f $desktop_out_location
     $desktop_args += '-var "input_directory={0}"' -f $base_out_location
+    $desktop_args += '--only=hyperv-vmcx'
     $desktop_args += $base_args
     $desktop_args += $desktop_json
 
@@ -172,8 +179,8 @@ if ($version.Major -ilt 10 -or $version.Build -ilt 17063) {
 }
 
 if (-not (Test-Path $enhanced_box_location)) {
-    $hvsocket_path = 'output-{0}-desktop-hvsocket' -f $vmNamePrefix
-    if (-not (Test-Path $hvsocket_path)) {
+    $input_dir = Join-Path -Path $desktop_hvsocket_out_location -ChildPath $enhanced_vm_name
+    if (-not (Test-Path $input_dir)) {
         Write-Output -InputObject "Changing desktop vm to use hvsocket for enhanced session transport"
         & "./setup-enhanced-transport-type.ps1" -Path $desktop_out_location -OutPath $desktop_hvsocket_out_location -VmName $vmNamePrefix -OutVmName $enhanced_vm_name
         if (-not $?) {
@@ -187,8 +194,8 @@ if (-not (Test-Path $enhanced_box_location)) {
     $enhanced_args += '-var "vm_name={0}"' -f $enhanced_vm_name
     $enhanced_args += '-var "output_name={0}"' -f $enhanced_vm_name
     $enhanced_args += '-var "output_directory={0}"' -f $enhanced_out_location
-    $input_dir = Join-Path -Path $desktop_hvsocket_out_location -ChildPath $enhanced_vm_name
     $enhanced_args += '-var "input_directory={0}"' -f $input_dir
+    $enhanced_args += '--only=hyperv-vmcx'
     $enhanced_args += $base_args
     $enhanced_args += $enhanced_json
 
