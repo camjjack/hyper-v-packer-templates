@@ -128,11 +128,20 @@
       "./scripts/update.sh",
       "./scripts/vagrant.sh",
       "./scripts/disable-daily-update.sh",
-      "./scripts/ansible.sh",
-      "./scripts/fix-locale.sh"
+      "./scripts/ansible.sh"
     ],
     "expect_disconnect": true
-  },{    
+  },{
+    "environment_vars": [
+      "LOCALE={{user `locale`}}"
+    ],    
+    "type": "shell",
+    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+    "scripts": [
+      "./scripts/fix-locale.sh"
+    ],
+   "expect_disconnect": true
+   },{    
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
     "scripts": [
