@@ -207,8 +207,8 @@ if (-not (Test-Path $enhanced_box_location)) {
     }
 
     if ($vagrantAdd) {
-        $enhanced_vagrant_args = $base_args
-        $enhanced_vagrant_args += '-name "{0}"' -f $enhanced_vm_name
+        $enhanced_vagrant_args = $vagrant_add_args
+        $enhanced_vagrant_args += '-name "{0}"' -f $vmNamePrefix
         $enhanced_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $enhanced_vm_name
 
         $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $enhanced_vagrant_args -NoNewWindow -PassThru -Wait

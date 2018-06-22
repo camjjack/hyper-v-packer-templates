@@ -9,7 +9,7 @@ desktop_json="ubuntu-desktop.json"
 
 
 output_name_prefix="output-ubuntu"
-vm_name_prefix="ubuntu"
+vm_name_prefix="ubuntu-18.04"
 cpus="2"
 ram_size="4096"
 disk_size="200000"
@@ -33,6 +33,7 @@ usage() {
     echo -e "\t-f, --force\t\t\t\t\tDefault behaivor is to skip any step that had been successfully completed before. Force will ensure all steps are run. Internally this is achieved by performing a clean before building."
     echo -e "\t-c, --clean\t\t\t\t\tCleans up all the artifacts of the build process."
     echo -e "\t-d, --debug\t\t\t\t\tCauses packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight."
+    echo -e "\t-a, --add_vagrant\t\t\t\t\tCleans up all the artifacts of the build process."
     echo -e "\t-h, --help\t\t\t\t\tThis help"
 }
 while [ "$1" != "" ]; do
@@ -61,6 +62,8 @@ while [ "$1" != "" ]; do
                                 exit
                                 ;;
         -d | --debug )          debug=1
+                                ;;
+        -a | --add_vagrant )    add_vagrant=1
                                 ;;
         -h | --help )           usage
                                 exit
@@ -107,7 +110,7 @@ if [ ! -f $base_box_location ]; then
     eval ${args[@]}
 fi
 
-desktop_box_location="$box_out_dir/hyperv-$vm_name_prefix-desktop.box"
+desktop_box_location="$box_out_dir/virtualbox-$vm_name_prefix-desktop.box"
 if [ ! -f $desktop_box_location ]; then
     echo "Building desktop image"
     desktop_args=("-var \"vm_name=$vm_name_prefix-desktop\"")
@@ -123,4 +126,15 @@ if [ ! -f $desktop_box_location ]; then
     args+=("$desktop_json")
     echo ${args[@]}
     eval ${args[@]}
+fi
+if [ -f $desktop_box_location ]; then
+    if [ $add_vagrant ]; then
+        args=("vagrant")
+        args+=("box")
+        args+=("add")
+        args+=("--name ${vm_name_prefix}")
+        args+=("${desktop_box_location}")
+        echo ${args[@]}
+        eval ${args[@]}
+    fi
 fi
