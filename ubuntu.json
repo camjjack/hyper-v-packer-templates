@@ -119,7 +119,8 @@
     "only": ["virtualbox-iso"]
   },{
     "environment_vars": [
-      "SSH_USERNAME={{user `username`}}"
+      "SSH_USERNAME={{user `username`}}",
+      "LOCALE={{user `locale`}}"
     ],    
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
@@ -127,7 +128,8 @@
       "./scripts/update.sh",
       "./scripts/vagrant.sh",
       "./scripts/disable-daily-update.sh",
-      "./scripts/ansible.sh"
+      "./scripts/ansible.sh",
+      "./scripts/fix-locale.sh"
     ],
     "expect_disconnect": true
   },{    
