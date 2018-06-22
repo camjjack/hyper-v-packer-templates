@@ -126,7 +126,8 @@
     "scripts": [
       "./scripts/update.sh",
       "./scripts/vagrant.sh",
-      "./scripts/disable-daily-update.sh"
+      "./scripts/disable-daily-update.sh",
+      "./scripts/ansible.sh"
     ],
     "expect_disconnect": true
   },{    

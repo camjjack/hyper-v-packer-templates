@@ -4,12 +4,12 @@ debug=
 log_path=packer-log.txt
 
 box_out_dir="dist"
-base_json="hyperv-ubuntu-16.04.json"
-desktop_json="hyperv-ubuntu-16.04-desktop.json"
+base_json="ubuntu.json"
+desktop_json="ubuntu-desktop.json"
 
 
-output_name_prefix="output-ubuntu-16.04"
-vm_name_prefix="ubuntu-16.04"
+output_name_prefix="output-ubuntu"
+vm_name_prefix="ubuntu"
 cpus="2"
 ram_size="4096"
 disk_size="200000"
