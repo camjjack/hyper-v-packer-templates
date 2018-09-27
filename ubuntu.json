@@ -4,7 +4,7 @@
     "ram_size": "2048",
     "disk_size": "200000",
     "vm_name": "ubuntu-bionic",
-    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04-server-amd64.iso",
+    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.1-server-amd64.iso",
     "iso_checksum_type": "sha1",
     "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/SHA1SUMS",
     "output_directory": "./output-ubuntu-18.04/",
