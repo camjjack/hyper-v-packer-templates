@@ -116,13 +116,13 @@
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell.exe -File E:\floppy\fixnetwork.ps1</CommandLine>
+                    <CommandLine>cmd.exe /c for %c in (A:\ E:\ F:\) do powershell.exe -File %cfloppy\fixnetwork.ps1</CommandLine>
                     <Description>Fix public network</Description>
                     <Order>3</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell.exe -File E:\floppy\winrm.ps1</CommandLine>
+                    <CommandLine>cmd.exe /c for %c in (A:\ E:\ F:\) do powershell.exe -File %cfloppy\winrm.ps1</CommandLine>
                     <Description>Enable and configure WinRM</Description>
                     <Order>4</Order>
                     <RequiresUserInput>true</RequiresUserInput>

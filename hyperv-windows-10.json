@@ -40,6 +40,36 @@
     "secondary_iso_images": [
       "./windows/iso/floppy.iso"
     ]
+  },
+  {
+    "vm_name":"{{user `vm_name`}}",
+    "type": "virtualbox-iso",
+    "disk_size": "{{user `disk_size`}}",
+    "guest_additions_mode": "upload",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_checksum": "{{ user `iso_checksum` }}",
+    "communicator":"winrm",
+    "winrm_username": "{{user `username`}}",
+    "winrm_password": "{{user `password`}}",
+    "winrm_timeout" : "4h",
+    "shutdown_command": "shutdown /s /f /t 0",
+    "boot_wait": "0s",
+    "boot_command": [
+      "<enter><wait><enter>"
+    ],
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--memory", "{{user `ram_size`}}"],
+      ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpu`}}"]
+    ],
+    "guest_os_type": "Windows10_64",
+    "output_directory": "{{user `output_directory`}}",
+    "floppy_files": [
+      "./windows/answer_files/virtualbox/autounattend.xml"
+    ],
+    "floppy_dirs": [
+      "./windows/floppy"
+    ]
   }],
   "provisioners": [{
     "environment_vars": [
@@ -55,6 +85,29 @@
       "./windows/scripts/scrub.ps1"
     ]
   }],
+  "provisioners": [{  
+      "type": "powershell",
+      "elevated_user": "{{user `username`}}",
+      "elevated_password": "{{user `password`}}",
+      "scripts": [
+        "./windows/scripts/install-virtualbox-guest-additions.ps1"
+      ],
+      "only": ["virtualbox-iso"]
+    },{
+      "environment_vars": [
+        "SSH_USERNAME={{user `username`}}"
+      ],    
+      "type": "powershell",
+      "elevated_user": "{{user `username`}}",
+      "elevated_password": "{{user `password`}}",
+      "scripts": [
+        "./windows/scripts/install-chocolatey.ps1",
+        "./windows/scripts/compile-dotnet-assemblies.ps1",
+        "./windows/scripts/defrag.ps1",
+        "./windows/scripts/scrub.ps1"
+      ]
+    }
+  ],
   "post-processors": [
     {
       "type": "vagrant",
