@@ -4,7 +4,7 @@
     "ram_size": "2048",
     "disk_size": "200000",
     "vm_name": "ubuntu-bionic",
-    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.1-server-amd64.iso",
+    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.2-server-amd64.iso",
     "iso_checksum_type": "sha1",
     "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/SHA1SUMS",
     "output_directory": "./output-ubuntu-18.04/",
@@ -17,7 +17,8 @@
     "keyboard_variant" : "us",
     "keyboard_layout" : "USA",
     "locale" : "en_US.UTF-8",
-    "box_out_dir": "./dist/"
+    "box_out_dir": "./dist/",
+    "tmp": "%USERPROFILE%/AppData/Local/Temp"
   },
   "builders": [
   {
@@ -33,6 +34,7 @@
     "ssh_password": "{{user `password`}}",	
     "ssh_timeout" : "4h",
     "boot_wait": "0s",
+    "temp_path": "{{user `tmp`}}",
     "boot_command": [
       "<esc><wait5>",
       "linux {{user `vmlinuz`}} ",
@@ -141,14 +143,7 @@
       "./scripts/fix-locale.sh"
     ],
    "expect_disconnect": true
-   },{    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/hyperv-gen2.sh"
-    ],
-    "only": ["hyperv-iso"]
-  },{
+   },{
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
     "scripts": [

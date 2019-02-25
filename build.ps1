@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Builds Packer Ubuntu 16.04 boxes for Hyper-V
+    Builds Packer Ubuntu 18.04 boxes for Hyper-V
 .DESCRIPTION
     Wrapper around packer and some build configurations to automate the building process for three boxes.
-      1) Base Ubuntu 16.04 server
-      2) Ubuntu 16.04 Desktop
-      3) Ubuntu 16.04 Desktop with enhanced session support (Currently equires Windows insider build) see: https://blogs.technet.microsoft.com/virtualization/2018/02/28/sneak-peek-taking-a-spin-with-enhanced-linux-vms/
+      1) Base Ubuntu 18.04 server
+      2) Ubuntu 18.04 Desktop
+      3) Ubuntu 18.04 Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
     Also provides command line configuration for these builds.
 .PARAMETER outputNamePrefix
     The base name for the output directories. This is used to pass to following packer builds to generate the desktop and enhanced session boxes.
@@ -75,6 +75,7 @@ $base_args += '-var "ram_size={0}"' -f $ramSize
 $base_args += '-var "disk_size={0}"' -f $diskSize
 $base_args += '-var "username={0}"' -f $username
 $base_args += '-var "box_out_dir={0}"' -f $box_out_dir
+$base_args += '-var "tmp={0}\{1}"' -f $PSScriptRoot, "tmp"
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'

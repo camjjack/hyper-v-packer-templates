@@ -9,13 +9,14 @@
       "output_directory": "./output-ubuntu-16.04-enhanced/",
       "input_directory": "./output-ubuntu-16.04-desktop-hvsocket/packer-hyperv-vmcx/",
       "output_name": "ubuntu-xenial-enhanced",
-      "box_out_dir": "./dist/"
+      "box_out_dir": "./dist/",
+      "tmp": "%USERPROFILE%/AppData/Local/Temp"
     },
     "builders": [
     {
         "type": "hyperv-vmcx",
         "vm_name":"{{user `vm_name`}}",
-        "clone_from_vmxc_path": "{{user `input_directory`}}",
+        "clone_from_vmcx_path": "{{user `input_directory`}}",
         "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
         "ssh_password": "{{user `password`}}",
         "ssh_username": "{{user `username`}}",
@@ -23,6 +24,7 @@
         "cpu": "{{user `cpu`}}",
         "switch_name":"{{user `hyperv_switchname`}}",
         "enable_secure_boot":false,
+        "temp_path": "{{user `tmp`}}",
         "output_directory": "{{user `output_directory`}}"
     }],
     "provisioners": [{   

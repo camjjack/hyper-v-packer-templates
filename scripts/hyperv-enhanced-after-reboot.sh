@@ -1,5 +1,5 @@
 #!/bin/dash -ex
-# Enhanced support - see https://blogs.technet.microsoft.com/virtualization/2018/02/28/sneak-peek-taking-a-spin-with-enhanced-linux-vms/
+# Enhanced support - see https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
 
 # Only for desktop installs
 dpkg  -l ubuntu-desktop
@@ -8,15 +8,9 @@ if [ $? -ge 1 ]; then
 fi
 
 # install.sh needed to reboot half way through. Thats happened now so kick it off again
-pushd ~/xrdp-init/ubuntu/18.04/
+pushd /tmp/
 
-echo "==> Running xrpd-init install again."
+echo "==> Running linux-vm-tools install again."
 ./install.sh
 
-# Setup the user for the enhanced session.
-
-if [ $? -eq 0 ]; then
-    echo "==> Running xrpd-init config-user."
-    ./config-user.sh
-fi
 popd
