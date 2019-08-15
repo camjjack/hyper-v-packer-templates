@@ -1,15 +1,15 @@
 {
     "variables": {
-      "vm_name": "ubuntu-xenial-desktop",
+      "vm_name": "ubuntu-bionic-desktop",
       "cpu": "2",
       "ram_size": "2048",
       "hyperv_switchname": "{{env `hyperv_switchname`}}",
       "username" : "vagrant",
       "password" : "vagrant",
-      "output_directory": "./output-ubuntu-16.04-desktop/",
-      "input_directory": "./output-ubuntu-16.04/",
-      "input_name": "ubuntu-xenial",
-      "output_name": "ubuntu-xenial-desktop",
+      "output_directory": "./output-ubuntu-18.04-desktop/",
+      "input_directory": "./output-ubuntu-18.04/",
+      "input_name": "ubuntu-bionic",
+      "output_name": "ubuntu-bionic-desktop",
       "box_out_dir": "./dist/",
       "tmp": "%USERPROFILE%/AppData/Local/Temp"
     },
@@ -21,8 +21,8 @@
         "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
         "ssh_password": "{{user `password`}}",
         "ssh_username": "{{user `username`}}",
-        "ram_size": "{{user `ram_size`}}",
-        "cpu": "{{user `cpu`}}",
+        "memory": "{{user `ram_size`}}",
+        "cpus": "{{user `cpu`}}",
         "switch_name":"{{user `hyperv_switchname`}}",
         "enable_secure_boot":false,
         "output_directory": "{{user `output_directory`}}",
@@ -35,10 +35,6 @@
         "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
         "ssh_password": "{{user `password`}}",
         "ssh_username": "{{user `username`}}",
-        "vboxmanage": [
-            ["modifyvm", "{{.Name}}", "--memory", "{{user `ram_size`}}"],
-            ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpu`}}"]
-        ],
         "shutdown_timeout": "10m",
         "output_directory": "{{user `output_directory`}}"
     }],

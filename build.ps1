@@ -121,7 +121,7 @@ if (-not (Test-Path $base_box_location)) {
     }
 
     if ($vagrantAdd) {
-        $server_vagrant_args = $base_args
+        $server_vagrant_args = $vagrant_add_args
         $server_vagrant_args += '-name "{0}"' -f $vmNamePrefix
         $server_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $vmNamePrefix
 
@@ -160,7 +160,7 @@ if (-not (Test-Path $desktop_box_location)) {
     }
 
     if ($vagrantAdd) {
-        $desktop_vagrant_args = $base_args
+        $desktop_vagrant_args = $vagrant_add_args
         $desktop_vagrant_args += '-name "{0}"' -f $desktop_vm_name
         $desktop_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $desktop_vm_name
 
@@ -209,7 +209,7 @@ if (-not (Test-Path $enhanced_box_location)) {
 
     if ($vagrantAdd) {
         $enhanced_vagrant_args = $vagrant_add_args
-        $enhanced_vagrant_args += '-name "{0}"' -f $vmNamePrefix
+        $enhanced_vagrant_args += '-name "{0}"' -f $enhanced_vm_name
         $enhanced_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $enhanced_vm_name
 
         $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $enhanced_vagrant_args -NoNewWindow -PassThru -Wait

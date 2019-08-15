@@ -54,6 +54,7 @@ $base_args += '-var "ram_size={0}"' -f $ramSize
 $base_args += '-var "disk_size={0}"' -f $diskSize
 $base_args += '-var "username={0}"' -f $username
 $base_args += '-var "box_out_dir={0}"' -f $box_out_dir
+$base_args += '-var "tmp={0}\{1}"' -f $PSScriptRoot, "tmp"
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'
@@ -89,6 +90,7 @@ if (-not (Test-Path $base_box_location)) {
     $win10_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $win10_args += '-var "output_name={0}"' -f $vmNamePrefix
     $win10_args += '-var "output_directory={0}"' -f $base_out_location
+    $win10_args += '--only=hyperv-iso'
 
     $win10_args += $base_args
     $win10_args += $base_json
@@ -96,7 +98,7 @@ if (-not (Test-Path $base_box_location)) {
     $build_server = Start-Process -FilePath $packer_exe -ArgumentList $win10_args -NoNewWindow -PassThru -Wait
 
     if ($build_server.ExitCode -ne 0) {
-        Write-Error -Message "Failed to build server image with packer"
+        Write-Error -Message "Failed to build Windows 10 with packer"
         exit 1
     }
 

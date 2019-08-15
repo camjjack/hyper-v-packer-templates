@@ -4,7 +4,7 @@
     "ram_size": "2048",
     "disk_size": "200000",
     "vm_name": "ubuntu-bionic",
-    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.2-server-amd64.iso",
+    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.3-server-amd64.iso",
     "iso_checksum_type": "sha1",
     "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/SHA1SUMS",
     "output_directory": "./output-ubuntu-18.04/",
@@ -61,8 +61,8 @@
     ],
     "http_directory": "preseed",
     "shutdown_command": "echo '{{user `username`}}' | sudo -S -E shutdown -P now",
-    "ram_size": "{{user `ram_size`}}",
-    "cpu": "{{user `cpu`}}",
+    "memory": "{{user `ram_size`}}",
+    "cpus": "{{user `cpu`}}",
     "generation": 2,
     "switch_name":"{{user `hyperv_switchname`}}",
     "enable_secure_boot":false,
@@ -80,10 +80,8 @@
     "ssh_password": "{{user `password`}}",	
     "ssh_timeout" : "4h",
     "boot_wait": "5s",
-    "vboxmanage": [
-      ["modifyvm", "{{.Name}}", "--memory", "{{user `ram_size`}}"],
-      ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpu`}}"]
-    ],
+    "cpus": "{{user `cpu`}}",
+    "memory": "{{user `ram_size`}}",
     "boot_command": [
       "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
       "{{user `vmlinuz`}} noapic",
@@ -139,16 +137,13 @@
     ],    
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/fix-locale.sh"
-    ],
+    "script": "./scripts/fix-locale.sh",
    "expect_disconnect": true
    },{
     "type": "shell",
     "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/cleanup.sh"
-    ]
+    "script": "./scripts/cleanup.sh",
+    "pause_before": "10s"
   }],
   "post-processors": [
     {
