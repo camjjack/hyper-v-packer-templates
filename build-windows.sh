@@ -21,7 +21,7 @@ clean() {
     rm -f $log_path
 }
 usage() {
-    echo "./build.sh [options]"
+    echo "./build-windows.sh [options]"
     echo "Options:"
     echo -e "\t--output_name_prefix [output_name_prefix]\tThe base name for the output directories. This is used to pass to following packer builds to generate the desktop box"
     echo -e "\t--vm_name_prefix [vm_name_prefix]\t\tThe base name for vm\"s that are created."
@@ -32,6 +32,7 @@ usage() {
     echo -e "\t-f, --force\t\t\t\t\tDefault behaivor is to skip any step that had been successfully completed before. Force will ensure all steps are run. Internally this is achieved by performing a clean before building."
     echo -e "\t-c, --clean\t\t\t\t\tCleans up all the artifacts of the build process."
     echo -e "\t-d, --debug\t\t\t\t\tCauses packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight."
+    echo -e "\t-a, --add_vagrant\t\t\t\t\tCleans up all the artifacts of the build process."
     echo -e "\t-h, --help\t\t\t\t\tThis help"
 }
 while [ "$1" != "" ]; do
@@ -60,6 +61,8 @@ while [ "$1" != "" ]; do
                                 exit
                                 ;;
         -d | --debug )          debug=1
+                                ;;
+        -a | --add_vagrant )    add_vagrant=1
                                 ;;
         -h | --help )           usage
                                 exit
@@ -103,4 +106,17 @@ if [ ! -f $base_box_location ]; then
     echo ${args[@]}
     export TMPDIR=/var/tmp/
     eval ${args[@]}
+fi
+
+if [ -f $base_box_location ]; then
+    if [ $add_vagrant ]; then
+        args=("vagrant")
+        args+=("box")
+        args+=("add")
+        args+=("--force")
+        args+=("--name ${vm_name_prefix}")
+        args+=("${base_box_location}")
+        echo ${args[@]}
+        eval ${args[@]}
+    fi
 fi

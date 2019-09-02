@@ -132,6 +132,7 @@ if [ -f $desktop_box_location ]; then
         args=("vagrant")
         args+=("box")
         args+=("add")
+        args+=("--force")
         args+=("--name ${vm_name_prefix}")
         args+=("${desktop_box_location}")
         echo ${args[@]}
