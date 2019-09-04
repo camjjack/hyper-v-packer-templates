@@ -62,6 +62,16 @@
     "memory": "{{user `ram_size`}}",
     "cpus": "{{user `cpu`}}",
     "guest_os_type": "Windows10_64",
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--graphicscontroller", "vboxsvga"],
+      ["modifyvm", "{{.Name}}", "--accelerate2dvideo", "on"],
+      ["modifyvm", "{{.Name}}", "--accelerate3d", "off"],
+      ["modifyvm", "{{.Name}}", "--vram", "128"],
+      ["modifyvm", "{{.Name}}", "--clipboard", "bidirectional"],
+      ["modifyvm", "{{.Name}}", "--draganddrop", "bidirectional"],
+      ["modifyvm", "{{.Name}}", "--usb", "on"],
+      ["modifyvm", "{{.Name}}", "--monitorcount", "1"]
+    ],
     "output_directory": "{{user `output_directory`}}",
     "floppy_files": [
       "./windows/answer_files/virtualbox/autounattend.xml"
