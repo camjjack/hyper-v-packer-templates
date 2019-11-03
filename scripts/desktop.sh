@@ -12,4 +12,4 @@ GDM_CUSTOM_CONFIG=/etc/gdm3/custom.conf
 echo "[daemon]" >> $GDM_CUSTOM_CONFIG
 echo "# Enabling automatic login" >> $GDM_CUSTOM_CONFIG
 echo "AutomaticLoginEnable=True" >> $GDM_CUSTOM_CONFIG
-echo "AutomaticLoginEnable=${USERSSH_USERNAME}" >> $GDM_CUSTOM_CONFIG
+echo "AutomaticLoginEnable=${SSH_USER}" >> $GDM_CUSTOM_CONFIG
