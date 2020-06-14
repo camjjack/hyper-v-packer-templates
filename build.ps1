@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Builds Packer Ubuntu 18.04 boxes for Hyper-V
+    Builds Packer Ubuntu 20.04 boxes for Hyper-V
 .DESCRIPTION
     Wrapper around packer and some build configurations to automate the building process for three boxes.
-      1) Base Ubuntu 18.04 server
-      2) Ubuntu 18.04 Desktop
-      3) Ubuntu 18.04 Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
+      1) Base Ubuntu 20.04 server
+      2) Ubuntu 20.04 Desktop
+      3) Ubuntu 20.04 Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
     Also provides command line configuration for these builds.
 .PARAMETER outputNamePrefix
     The base name for the output directories. This is used to pass to following packer builds to generate the desktop and enhanced session boxes.
@@ -33,8 +33,8 @@
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
-param([string]$outputNamePrefix = "output-ubuntu-18.04",
-      [string]$vmNamePrefix = "ubuntu-18.04",
+param([string]$outputNamePrefix = "output-ubuntu-20.04",
+      [string]$vmNamePrefix = "ubuntu-20.04",
       [string]$cpus = "2",
       [string]$ramSize = "4096",
       [string]$diskSize = "200000",
@@ -52,7 +52,7 @@ $vagrant_exe = 'vagrant.exe'
 $base_json = './ubuntu.json'
 $desktop_json = './ubuntu-desktop.json'
 $enhanced_json = './ubuntu-enhanced.json'
-$box_out_dir = './dist/'
+$box_out_dir = 'dist'
 
 # Vm names and locations based on the prefixes given as a parameter.
 $base_out_location = './{0}/' -f $outputNamePrefix
@@ -119,19 +119,6 @@ if (-not (Test-Path $base_box_location)) {
         Write-Error -Message "Failed to build server image with packer"
         exit 1
     }
-
-    if ($vagrantAdd) {
-        $server_vagrant_args = $vagrant_add_args
-        $server_vagrant_args += '-name "{0}"' -f $vmNamePrefix
-        $server_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $vmNamePrefix
-
-        $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $server_vagrant_args -NoNewWindow -PassThru -Wait
-    
-        if ($add_server.ExitCode -ne 0) {
-            Write-Error -Message "Failed to add generated box file to Vagrant"
-            exit 1
-        }
-    }
 }
 
 if($dontBuildDesktop) {
@@ -157,19 +144,6 @@ if (-not (Test-Path $desktop_box_location)) {
     if ($build_desktop.ExitCode -ne 0) {
         Write-Error -Message "Failed to build desktop image with packer"
         exit 1
-    }
-
-    if ($vagrantAdd) {
-        $desktop_vagrant_args = $vagrant_add_args
-        $desktop_vagrant_args += '-name "{0}"' -f $desktop_vm_name
-        $desktop_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $desktop_vm_name
-
-        $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $desktop_vagrant_args -NoNewWindow -PassThru -Wait
-    
-        if ($add_server.ExitCode -ne 0) {
-            Write-Error -Message "Failed to add generated desktop box file to Vagrant"
-            exit 1
-        }
     }
 }
 
@@ -207,16 +181,16 @@ if (-not (Test-Path $enhanced_box_location)) {
         exit 1
     }
 
-    if ($vagrantAdd) {
-        $enhanced_vagrant_args = $vagrant_add_args
-        $enhanced_vagrant_args += '-name "{0}"' -f $enhanced_vm_name
-        $enhanced_vagrant_args += './{0}/hyperv-{1}.box' -f $box_out_dir, $enhanced_vm_name
+}
 
-        $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $enhanced_vagrant_args -NoNewWindow -PassThru -Wait
-    
-        if ($add_server.ExitCode -ne 0) {
-            Write-Error -Message "Failed to add generated enhanced box file to Vagrant"
-            exit 1
-        }
+if ($vagrantAdd) {
+    $enhanced_vagrant_args = $vagrant_add_args
+    $enhanced_vagrant_args += '--name "{0}"' -f $vmNamePrefix
+    $enhanced_vagrant_args += '{0}\hyperv-{1}.box' -f $box_out_dir, $enhanced_vm_name
+    $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $enhanced_vagrant_args -NoNewWindow -PassThru -Wait
+
+    if ($add_server.ExitCode -ne 0) {
+        Write-Error -Message "Failed to add generated enhanced box file to Vagrant"
+        exit 1
     }
 }

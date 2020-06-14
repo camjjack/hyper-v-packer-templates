@@ -3,12 +3,12 @@
     "cpu": "2",
     "ram_size": "2048",
     "disk_size": "200000",
-    "vm_name": "ubuntu-bionic",
-    "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.3-server-amd64.iso",
+    "vm_name": "ubuntu-focal",
+    "iso_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04-legacy-server-amd64.iso",
     "iso_checksum_type": "sha1",
-    "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/SHA1SUMS",
-    "output_directory": "./output-ubuntu-18.04/",
-    "output_name": "ubuntu-bionic",
+    "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/SHA1SUMS",
+    "output_directory": "./output-ubuntu-20.04/",
+    "output_name": "ubuntu-focal",
     "vmlinuz": "/install/vmlinuz",
     "initrd": "/install/initrd.gz",
     "hyperv_switchname": "{{env `hyperv_switchname`}}",
@@ -17,8 +17,7 @@
     "keyboard_variant" : "us",
     "keyboard_layout" : "USA",
     "locale" : "en_US.UTF-8",
-    "box_out_dir": "./dist/",
-    "tmp": "%USERPROFILE%/AppData/Local/Temp"
+    "box_out_dir": "./dist/"
   },
   "builders": [
   {
@@ -34,7 +33,6 @@
     "ssh_password": "{{user `password`}}",	
     "ssh_timeout" : "4h",
     "boot_wait": "0s",
-    "temp_path": "{{user `tmp`}}",
     "boot_command": [
       "<esc><wait5>",
       "linux {{user `vmlinuz`}} ",
