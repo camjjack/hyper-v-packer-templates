@@ -1,126 +1,173 @@
 {
-  "variables": {
-    "vm_name": "windows-10",
-    "cpu": "2",
-    "ram_size": "2048",
-    "disk_size": "200000",
-    "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
-    "iso_checksum_type": "none",
-    "iso_checksum": "ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
-    "hyperv_switchname": "{{env `hyperv_switchname`}}",
-    "username" : "vagrant",
-    "password" : "vagrant",
-    "output_directory": "./output-windows-10/",
-    "box_out_dir": "./dist/"
-  },
-  "builders": [
-  {
-    "vm_name":"{{user `vm_name`}}",
-    "type": "hyperv-iso",
-    "disk_size": "{{user `disk_size`}}",
-    "guest_additions_mode":"disable",
-    "iso_url": "{{user `iso_url`}}",
-    "iso_checksum_type": "{{user `iso_checksum_type`}}",
-    "iso_checksum": "{{ user `iso_checksum` }}",
-    "communicator":"winrm",
-    "winrm_username": "{{user `username`}}",
-    "winrm_password": "{{user `password`}}",
-    "winrm_timeout" : "4h",
-    "shutdown_command": "shutdown /s /f /t 0",
-    "memory": "{{user `ram_size`}}",
-    "cpus": "{{user `cpu`}}",
-    "generation": 2,
-    "boot_wait": "70s",
-    "boot_command": [
-        "<tab><wait><enter><wait>",
-        "a<wait>a<wait>a<wait>a<wait>a<wait>a<wait>"
+    "builders": [
+      {
+        "boot_command": [
+          "<tab><wait><enter><wait>",
+          "a<wait>a<wait>a<wait>a<wait>a<wait>a<wait>"
+        ],
+        "boot_wait": "70s",
+        "communicator": "winrm",
+        "cpus": "{{user `cpu`}}",
+        "disk_size": "{{user `disk_size`}}",
+        "enable_secure_boot": true,
+        "generation": 2,
+        "guest_additions_mode": "disable",
+        "iso_checksum": "{{user `iso_checksum_type`}}:{{ user `iso_checksum` }}",
+        "iso_url": "{{user `iso_url`}}",
+        "memory": "{{user `ram_size`}}",
+        "output_directory": "{{user `output_directory`}}",
+        "secondary_iso_images": [
+          "./windows/iso/floppy.iso"
+        ],
+        "shutdown_command": "shutdown /s /f /t 0",
+        "switch_name": "{{user `hyperv_switchname`}}",
+        "type": "hyperv-iso",
+        "vm_name": "{{user `vm_name`}}",
+        "winrm_password": "{{user `password`}}",
+        "winrm_timeout": "4h",
+        "winrm_username": "{{user `username`}}"
+      },
+      {
+        "boot_command": [
+          "<enter><wait><enter>"
+        ],
+        "boot_wait": "0s",
+        "communicator": "winrm",
+        "cpus": "{{user `cpu`}}",
+        "disk_size": "{{user `disk_size`}}",
+        "floppy_dirs": [
+          "./windows/floppy"
+        ],
+        "floppy_files": [
+          "./windows/answer_files/virtualbox/autounattend.xml"
+        ],
+        "guest_additions_mode": "upload",
+        "guest_os_type": "Windows10_64",
+        "iso_checksum": "{{user `iso_checksum_type`}}:{{ user `iso_checksum` }}",
+        "iso_url": "{{user `iso_url`}}",
+        "memory": "{{user `ram_size`}}",
+        "output_directory": "{{user `output_directory`}}",
+        "shutdown_command": "shutdown /s /f /t 0",
+        "type": "virtualbox-iso",
+        "vboxmanage": [
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--graphicscontroller",
+            "vboxsvga"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--accelerate2dvideo",
+            "on"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--accelerate3d",
+            "off"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--vram",
+            "128"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--clipboard",
+            "bidirectional"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--draganddrop",
+            "bidirectional"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--usb",
+            "on"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--monitorcount",
+            "1"
+          ]
+        ],
+        "vm_name": "{{user `vm_name`}}",
+        "winrm_password": "{{user `password`}}",
+        "winrm_timeout": "4h",
+        "winrm_username": "{{user `username`}}"
+      }
     ],
-    "switch_name":"{{user `hyperv_switchname`}}",
-    "enable_secure_boot":true,
-    "output_directory": "{{user `output_directory`}}",
-    "secondary_iso_images": [
-      "./windows/iso/floppy.iso"
-    ]
-  },
-  {
-    "vm_name":"{{user `vm_name`}}",
-    "type": "virtualbox-iso",
-    "disk_size": "{{user `disk_size`}}",
-    "guest_additions_mode": "upload",
-    "iso_url": "{{user `iso_url`}}",
-    "iso_checksum_type": "{{user `iso_checksum_type`}}",
-    "iso_checksum": "{{ user `iso_checksum` }}",
-    "communicator":"winrm",
-    "winrm_username": "{{user `username`}}",
-    "winrm_password": "{{user `password`}}",
-    "winrm_timeout" : "4h",
-    "shutdown_command": "shutdown /s /f /t 0",
-    "boot_wait": "0s",
-    "boot_command": [
-      "<enter><wait><enter>"
+    "post-processors": [
+      {
+        "keep_input_artifact": true,
+        "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box",
+        "type": "vagrant"
+      }
     ],
-    "memory": "{{user `ram_size`}}",
-    "cpus": "{{user `cpu`}}",
-    "guest_os_type": "Windows10_64",
-    "vboxmanage": [
-      ["modifyvm", "{{.Name}}", "--graphicscontroller", "vboxsvga"],
-      ["modifyvm", "{{.Name}}", "--accelerate2dvideo", "on"],
-      ["modifyvm", "{{.Name}}", "--accelerate3d", "off"],
-      ["modifyvm", "{{.Name}}", "--vram", "128"],
-      ["modifyvm", "{{.Name}}", "--clipboard", "bidirectional"],
-      ["modifyvm", "{{.Name}}", "--draganddrop", "bidirectional"],
-      ["modifyvm", "{{.Name}}", "--usb", "on"],
-      ["modifyvm", "{{.Name}}", "--monitorcount", "1"]
+    "provisioners": [
+      {
+        "elevated_password": "{{user `password`}}",
+        "elevated_user": "{{user `username`}}",
+        "environment_vars": [
+          "SSH_USERNAME={{user `username`}}"
+        ],
+        "scripts": [
+          "./windows/scripts/install-chocolatey.ps1",
+          "./windows/scripts/enable-hyperv.ps1",
+          "./windows/scripts/compile-dotnet-assemblies.ps1",
+          "./windows/scripts/defrag.ps1",
+          "./windows/scripts/scrub.ps1"
+        ],
+        "type": "powershell"
+      },
+      {
+        "elevated_password": "{{user `password`}}",
+        "elevated_user": "{{user `username`}}",
+        "only": [
+          "virtualbox-iso"
+        ],
+        "scripts": [
+          "./windows/scripts/install-virtualbox-guest-additions.ps1"
+        ],
+        "type": "powershell"
+      },
+      {
+        "elevated_password": "{{user `password`}}",
+        "elevated_user": "{{user `username`}}",
+        "environment_vars": [
+          "SSH_USERNAME={{user `username`}}"
+        ],
+        "scripts": [
+          "./windows/scripts/install-chocolatey.ps1",
+          "./windows/scripts/compile-dotnet-assemblies.ps1",
+          "./windows/scripts/defrag.ps1",
+          "./windows/scripts/scrub.ps1"
+        ],
+        "type": "powershell"
+      }
     ],
-    "output_directory": "{{user `output_directory`}}",
-    "floppy_files": [
-      "./windows/answer_files/virtualbox/autounattend.xml"
-    ],
-    "floppy_dirs": [
-      "./windows/floppy"
-    ]
-  }],
-  "provisioners": [{
-      "environment_vars": [
-        "SSH_USERNAME={{user `username`}}"
-      ],    
-      "type": "powershell",
-      "elevated_user": "{{user `username`}}",
-      "elevated_password": "{{user `password`}}",
-      "scripts": [
-        "./windows/scripts/install-chocolatey.ps1",
-        "./windows/scripts/compile-dotnet-assemblies.ps1",
-        "./windows/scripts/defrag.ps1",
-        "./windows/scripts/scrub.ps1"
-      ]
-    },{  
-      "type": "powershell",
-      "elevated_user": "{{user `username`}}",
-      "elevated_password": "{{user `password`}}",
-      "scripts": [
-        "./windows/scripts/install-virtualbox-guest-additions.ps1"
-      ],
-      "only": ["virtualbox-iso"]
-    },{
-      "environment_vars": [
-        "SSH_USERNAME={{user `username`}}"
-      ],    
-      "type": "powershell",
-      "elevated_user": "{{user `username`}}",
-      "elevated_password": "{{user `password`}}",
-      "scripts": [
-        "./windows/scripts/install-chocolatey.ps1",
-        "./windows/scripts/compile-dotnet-assemblies.ps1",
-        "./windows/scripts/defrag.ps1",
-        "./windows/scripts/scrub.ps1"
-      ]
+    "variables": {
+      "box_out_dir": "./dist/",
+      "cpu": "2",
+      "disk_size": "200000",
+      "hyperv_switchname": "{{env `hyperv_switchname`}}",
+      "iso_checksum": "f1a4f2176259167cd2c8bf83f3f5a4039753b6cc28c35ac624da95a36e9620fc",
+      "iso_checksum_type": "sha256",
+      "iso_url": "https://software-download.microsoft.com/download/pr/19041.264.200511-0456.vb_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+      "output_directory": "./output-windows-10/",
+      "password": "vagrant",
+      "ram_size": "2048",
+      "username": "vagrant",
+      "vm_name": "windows-10"
     }
-  ],
-  "post-processors": [
-    {
-      "type": "vagrant",
-      "keep_input_artifact": true,
-      "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box"
-    }
-  ]
-}
+  }
+  
+  
