@@ -2,14 +2,15 @@
     "builders": [
       {
         "boot_command": [
-          "<tab><wait><enter><wait>",
-          "a<wait>a<wait>a<wait>a<wait>a<wait>a<wait>"
+          "<enter><wait><enter>"
         ],
-        "boot_wait": "70s",
+        "boot_wait": "1s",
         "communicator": "winrm",
         "cpus": "{{user `cpu`}}",
         "disk_size": "{{user `disk_size`}}",
+        "enable_mac_spoofing": true,
         "enable_secure_boot": true,
+        "enable_virtualization_extensions": false,
         "generation": 2,
         "guest_additions_mode": "disable",
         "iso_checksum": "{{user `iso_checksum_type`}}:{{ user `iso_checksum` }}",
@@ -164,7 +165,7 @@
       "iso_url": "https://software-download.microsoft.com/download/pr/19041.264.200511-0456.vb_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
       "output_directory": "./output-windows-10/",
       "password": "vagrant",
-      "ram_size": "2048",
+      "ram_size": "4096",
       "username": "vagrant",
       "vm_name": "windows-10"
     }
