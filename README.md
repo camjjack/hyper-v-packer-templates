@@ -15,6 +15,7 @@ So the goals for this project are simple:
 1. PowerShell - for our build scripts
 1. Hyper-V
     1. Windows 10 build 17063 or greater is required for enhanced mode support. See https://blogs.technet.microsoft.com/virtualization/2018/02/28/sneak-peek-taking-a-spin-with-enhanced-linux-vms/
+1. Intel CPU with VT-X - needed for nested virtualization. If you do not have a supported CPU set `enable_virtualization_extensions` to `false` in `hyperv-windows-10.json`
 
 ## Usage
 
@@ -47,7 +48,7 @@ A default build can be run like this:
 ```
 
 ## Supported packer boxes
-In keeping with my project goals above, Ubuntu 20.04 x64 and Windows 10 x64 are the only supported box OS's at this stage.
+In keeping with my project goals above, Ubuntu 20.04 x64 and Windows 10 x64 (2004) are the only supported box OS's at this stage.
 
 ## Troubleshooting
 The build script has a -debug option which sets some packer options to aid in debugging faulty templates. Start with the generated log file: packer-log.txt

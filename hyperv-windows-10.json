@@ -1,16 +1,19 @@
 {
     "builders": [
       {
+        "boot_wait": "65s",
         "boot_command": [
-          "<enter><wait><enter>"
+            "<tab><enter>",
+            "aaaaaaaaaaaa<enter>",
+            "aaaaaaaaaaaa<enter>",
+            "aaaaaa<wait1ms>aaaaaa<enter>"
         ],
-        "boot_wait": "1s",
         "communicator": "winrm",
         "cpus": "{{user `cpu`}}",
         "disk_size": "{{user `disk_size`}}",
         "enable_mac_spoofing": true,
         "enable_secure_boot": true,
-        "enable_virtualization_extensions": false,
+        "enable_virtualization_extensions": true,
         "generation": 2,
         "guest_additions_mode": "disable",
         "iso_checksum": "{{user `iso_checksum_type`}}:{{ user `iso_checksum` }}",
@@ -30,7 +33,7 @@
       },
       {
         "boot_command": [
-          "<enter><wait><enter>"
+          "<enter><enter><enter><enter><enter><enter>"
         ],
         "boot_wait": "0s",
         "communicator": "winrm",

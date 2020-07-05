@@ -22,6 +22,8 @@
     is achieved by performing a clean before building.
 .PARAMETER debug
     Causes packer to be run with debug settings. Useful if the scripts are not working and you need to debug in flight.
+.PARAMETER verbose
+    Turns on packer logging.
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
@@ -34,6 +36,7 @@ param([string]$outputNamePrefix = "output-windows-10",
       [switch]$clean = $false,
       [switch]$force = $false,
       [switch]$debug = $false,
+      [switch]$verbose = $false,
       [switch]$vagrantAdd = $false)
 
 #### Configuration
@@ -58,8 +61,14 @@ $base_args += '-var "tmp={0}\{1}"' -f $PSScriptRoot, "tmp"
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'
+}
+
+if ($verbose -or $debug) {
     $env:PACKER_LOG=1
     $env:PACKER_LOG_PATH=packer-log.txt
+} else {
+    $env:PACKER_LOG=0
+    $env:PACKER_LOG_PATH=''
 }
 
 if($Clean -or $force) {
@@ -103,8 +112,12 @@ if (-not (Test-Path $base_box_location)) {
     }
 
     if ($vagrantAdd) {
-        $win10_vagrant_args = $base_args
-        $win10_vagrant_args += '-name "{0}"' -f $vmNamePrefix
+        $win10_vagrant_args = @('box')
+        $win10_vagrant_args += 'add'
+        if($force) {
+            $win10_vagrant_args += '--force'
+        }
+        $win10_vagrant_args += '--name "{0}"' -f $vmNamePrefix
         $win10_vagrant_args += $base_box_location
 
         $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $win10_vagrant_args -NoNewWindow -PassThru -Wait
