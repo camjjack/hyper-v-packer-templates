@@ -1,61 +1,63 @@
 {
-    "variables": {
-      "vm_name": "ubuntu-focal-desktop",
-      "cpu": "2",
-      "ram_size": "2048",
-      "hyperv_switchname": "{{env `hyperv_switchname`}}",
-      "username" : "vagrant",
-      "password" : "vagrant",
-      "output_directory": "./output-ubuntu-20.04-desktop/",
-      "input_directory": "./output-ubuntu-20.04/",
-      "input_name": "ubuntu-focal",
-      "output_name": "ubuntu-focal-desktop",
-      "box_out_dir": "./dist/"
-    },
-    "builders": [
+  "builders": [
     {
-        "type": "hyperv-vmcx",
-        "vm_name":"{{user `vm_name`}}",
-        "clone_from_vmcx_path": "{{user `input_directory`}}",
-        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
-        "ssh_password": "{{user `password`}}",
-        "ssh_username": "{{user `username`}}",
-        "memory": "{{user `ram_size`}}",
-        "cpus": "{{user `cpu`}}",
-        "switch_name":"{{user `hyperv_switchname`}}",
-        "enable_secure_boot":false,
-        "output_directory": "{{user `output_directory`}}"
+      "clone_from_vmcx_path": "{{user `input_directory`}}",
+      "cpus": "{{user `cpu`}}",
+      "enable_secure_boot": false,
+      "memory": "{{user `ram_size`}}",
+      "output_directory": "{{user `output_directory`}}",
+      "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+      "ssh_password": "{{user `password`}}",
+      "ssh_username": "{{user `username`}}",
+      "switch_name": "{{user `hyperv_switchname`}}",
+      "type": "hyperv-vmcx",
+      "vm_name": "{{user `vm_name`}}"
     },
     {
-        "type": "virtualbox-ovf",
-        "source_path": "{{user `input_directory`}}/{{user `input_name`}}.ovf",
-        "vm_name":"{{user `vm_name`}}",
-        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
-        "ssh_password": "{{user `password`}}",
-        "ssh_username": "{{user `username`}}",
-        "shutdown_timeout": "10m",
-        "output_directory": "{{user `output_directory`}}"
-    }],
-    "provisioners": [{
-        "environment_vars": [
-          "SSH_USERNAME={{user `username`}}"
-        ],    
-        "type": "shell",
-        "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-        "scripts": [
-            "./scripts/update.sh",
-            "./scripts/desktop.sh",
-            "./scripts/cleanup.sh"
-        ],
-        "expect_disconnect": true
+      "output_directory": "{{user `output_directory`}}",
+      "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+      "shutdown_timeout": "10m",
+      "source_path": "{{user `input_directory`}}/{{user `input_name`}}.ovf",
+      "ssh_password": "{{user `password`}}",
+      "ssh_username": "{{user `username`}}",
+      "type": "virtualbox-ovf",
+      "vm_name": "{{user `vm_name`}}"
     }
-    ],
-    "post-processors": [
-        {
-        "type": "vagrant",
-        "keep_input_artifact": true,
-        "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box"
-        }
-    ]
-    
+  ],
+  "post-processors": [
+    {
+      "keep_input_artifact": true,
+      "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box",
+      "type": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "environment_vars": [
+        "SSH_USERNAME={{user `username`}}"
+      ],
+      "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+      "expect_disconnect": true,
+      "scripts": [
+        "./scripts/update.sh",
+        "./scripts/desktop.sh",
+        "./scripts/cleanup.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "box_out_dir": "./dist/",
+    "cpu": "2",
+    "hyperv_switchname": "{{env `hyperv_switchname`}}",
+    "input_directory": "./output-ubuntu-20.04/",
+    "input_name": "ubuntu-focal",
+    "output_directory": "./output-ubuntu-20.04-desktop/",
+    "output_name": "ubuntu-focal-desktop",
+    "password": "vagrant",
+    "ram_size": "2048",
+    "username": "vagrant",
+    "vm_name": "ubuntu-focal-desktop"
+  }
 }
+
