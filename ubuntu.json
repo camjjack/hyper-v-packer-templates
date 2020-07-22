@@ -1,162 +1,204 @@
 {
-  "variables": {
-    "cpu": "2",
-    "ram_size": "2048",
-    "disk_size": "200000",
-    "vm_name": "ubuntu-focal",
-    "iso_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04-legacy-server-amd64.iso",
-    "iso_checksum_type": "sha1",
-    "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/SHA1SUMS",
-    "output_directory": "./output-ubuntu-20.04/",
-    "output_name": "ubuntu-focal",
-    "vmlinuz": "/install/vmlinuz",
-    "initrd": "/install/initrd.gz",
-    "hyperv_switchname": "{{env `hyperv_switchname`}}",
-    "username" : "vagrant",
-    "password" : "vagrant",
-    "keyboard_variant" : "us",
-    "keyboard_layout" : "USA",
-    "locale" : "en_US.UTF-8",
-    "box_out_dir": "./dist/"
-  },
   "builders": [
-  {
-    "vm_name":"{{user `vm_name`}}",
-    "type": "hyperv-iso",
-    "disk_size": "{{user `disk_size`}}",
-    "guest_additions_mode":"disable",
-    "iso_url": "{{user `iso_url`}}",
-    "iso_checksum_type": "{{user `iso_checksum_type`}}",
-    "iso_checksum_url": "{{ user `iso_checksum_url` }}",
-    "communicator":"ssh",
-    "ssh_username": "{{user `username`}}",
-    "ssh_password": "{{user `password`}}",	
-    "ssh_timeout" : "4h",
-    "boot_wait": "0s",
-    "boot_command": [
-      "<esc><wait5>",
-      "linux {{user `vmlinuz`}} ",
-      "auto ",
-      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
-      "debian-installer={{user `locale`}} ",
-      "locale={{user `locale`}} ",
-      "hostname={{.Name}} ",
-      "fb=false ",
-      "debconf/frontend=noninteractive ",
-      "passwd/user-fullname={{user `username`}} ",
-      "passwd/username={{user `username`}} ",
-      "passwd/user-password={{user `password`}} ",
-      "passwd/user-password-again={{user `password`}} ",
-      "console-setup/ask_detect=false ",
-      "keymap={{user `keyboard_variant`}} ",
-      "kbd-chooser/method={{user `keyboard_variant`}} ",
-      "keyboard-configuration/layout={{user `keyboard_layout`}} ",
-      "keyboard-configuration/variant={{user `keyboard_layout`}} ",
-      "tasksel=ubuntu-desktop ",
-      "<enter>",
-      "initrd {{user `initrd`}}<enter>",
-      "boot<enter>"
-    ],
-    "http_directory": "preseed",
-    "shutdown_command": "echo '{{user `username`}}' | sudo -S -E shutdown -P now",
-    "memory": "{{user `ram_size`}}",
-    "cpus": "{{user `cpu`}}",
-    "generation": 2,
-    "switch_name":"{{user `hyperv_switchname`}}",
-    "enable_secure_boot":false,
-    "output_directory": "{{user `output_directory`}}"
-  },
-  {
-    "vm_name":"{{user `vm_name`}}",
-    "type": "virtualbox-iso",
-    "disk_size": "{{user `disk_size`}}",
-    "iso_url": "{{user `iso_url`}}",
-    "iso_checksum_type": "{{user `iso_checksum_type`}}",
-    "iso_checksum_url": "{{ user `iso_checksum_url` }}",
-    "communicator":"ssh",
-    "ssh_username": "{{user `username`}}",
-    "ssh_password": "{{user `password`}}",	
-    "ssh_timeout" : "4h",
-    "boot_wait": "5s",
-    "cpus": "{{user `cpu`}}",
-    "memory": "{{user `ram_size`}}",
-    "boot_command": [
-      "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-      "{{user `vmlinuz`}} noapic",
-      "auto ",
-      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
-      "debian-installer={{user `locale`}} ",
-      "locale={{user `locale`}} ",
-      "hostname={{.Name}} ",
-      "fb=false ",
-      "debconf/frontend=noninteractive ",
-      "passwd/user-fullname={{user `username`}} ",
-      "passwd/username={{user `username`}} ",
-      "passwd/user-password={{user `password`}} ",
-      "passwd/user-password-again={{user `password`}} ",
-      "console-setup/ask_detect=false ",
-      "keymap={{user `keyboard_variant`}} ",
-      "kbd-chooser/method={{user `keyboard_variant`}} ",
-      "keyboard-configuration/layout={{user `keyboard_layout`}} ",
-      "keyboard-configuration/variant={{user `keyboard_layout`}} ",
-      "tasksel=ubuntu-desktop ",
-      "initrd={{user `initrd`}}<enter>"
-    ],
-    "http_directory": "preseed",
-    "guest_os_type": "Ubuntu_64",
-    "vboxmanage": [
-      ["modifyvm", "{{.Name}}", "--graphicscontroller", "vboxsvga"],
-      ["modifyvm", "{{.Name}}", "--accelerate3d", "on"],
-      ["modifyvm", "{{.Name}}", "--vram", "128"],
-      ["modifyvm", "{{.Name}}", "--clipboard", "bidirectional"],
-      ["modifyvm", "{{.Name}}", "--draganddrop", "bidirectional"],
-      ["modifyvm", "{{.Name}}", "--usb", "on"],
-      ["modifyvm", "{{.Name}}", "--monitorcount", "1"]
-    ],
-    "shutdown_command": "echo '{{user `username`}}' | sudo -S -E shutdown -P now",
-    "shutdown_timeout": "10m",
-    "output_directory": "{{user `output_directory`}}"
-  }],
-  "provisioners": [{    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/virtualbox.sh"
-    ],
-    "only": ["virtualbox-iso"]
-  },{
-    "environment_vars": [
-      "SSH_USERNAME={{user `username`}}",
-      "LOCALE={{user `locale`}}"
-    ],    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "scripts": [
-      "./scripts/update.sh",
-      "./scripts/vagrant.sh",
-      "./scripts/disable-daily-update.sh",
-      "./scripts/ansible.sh"
-    ],
-    "expect_disconnect": true
-  },{
-    "environment_vars": [
-      "LOCALE={{user `locale`}}"
-    ],    
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "script": "./scripts/fix-locale.sh",
-   "expect_disconnect": true
-   },{
-    "type": "shell",
-    "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
-    "script": "./scripts/cleanup.sh",
-    "pause_before": "10s"
-  }],
+    {
+      "boot_command": [
+        "<esc><wait5>",
+        "linux {{user `vmlinuz`}} ",
+        "auto ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "debian-installer={{user `locale`}} ",
+        "locale={{user `locale`}} ",
+        "hostname={{.Name}} ",
+        "fb=false ",
+        "debconf/frontend=noninteractive ",
+        "passwd/user-fullname={{user `username`}} ",
+        "passwd/username={{user `username`}} ",
+        "passwd/user-password={{user `password`}} ",
+        "passwd/user-password-again={{user `password`}} ",
+        "console-setup/ask_detect=false ",
+        "keymap={{user `keyboard_variant`}} ",
+        "kbd-chooser/method={{user `keyboard_variant`}} ",
+        "keyboard-configuration/layout={{user `keyboard_layout`}} ",
+        "keyboard-configuration/variant={{user `keyboard_layout`}} ",
+        "tasksel=ubuntu-desktop ",
+        "<enter>",
+        "initrd {{user `initrd`}}<enter>",
+        "boot<enter>"
+      ],
+      "boot_wait": "0s",
+      "communicator": "ssh",
+      "cpus": "{{user `cpu`}}",
+      "disk_size": "{{user `disk_size`}}",
+      "enable_secure_boot": false,
+      "generation": 2,
+      "guest_additions_mode": "disable",
+      "http_directory": "preseed",
+      "iso_checksum": "file:{{ user `iso_checksum_url` }}",
+      "iso_url": "{{user `iso_url`}}",
+      "memory": "{{user `ram_size`}}",
+      "output_directory": "{{user `output_directory`}}",
+      "shutdown_command": "echo '{{user `username`}}' | sudo -S -E shutdown -P now",
+      "ssh_password": "{{user `password`}}",
+      "ssh_timeout": "4h",
+      "ssh_username": "{{user `username`}}",
+      "switch_name": "{{user `hyperv_switchname`}}",
+      "type": "hyperv-iso",
+      "vm_name": "{{user `vm_name`}}"
+    },
+    {
+      "boot_command": [
+        "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "{{user `vmlinuz`}} noapic",
+        "auto ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "debian-installer={{user `locale`}} ",
+        "locale={{user `locale`}} ",
+        "hostname={{.Name}} ",
+        "fb=false ",
+        "debconf/frontend=noninteractive ",
+        "passwd/user-fullname={{user `username`}} ",
+        "passwd/username={{user `username`}} ",
+        "passwd/user-password={{user `password`}} ",
+        "passwd/user-password-again={{user `password`}} ",
+        "console-setup/ask_detect=false ",
+        "keymap={{user `keyboard_variant`}} ",
+        "kbd-chooser/method={{user `keyboard_variant`}} ",
+        "keyboard-configuration/layout={{user `keyboard_layout`}} ",
+        "keyboard-configuration/variant={{user `keyboard_layout`}} ",
+        "tasksel=ubuntu-desktop ",
+        "initrd={{user `initrd`}}<enter>"
+      ],
+      "boot_wait": "5s",
+      "communicator": "ssh",
+      "cpus": "{{user `cpu`}}",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_os_type": "Ubuntu_64",
+      "http_directory": "preseed",
+      "iso_checksum": "file:{{ user `iso_checksum_url` }}",
+      "iso_url": "{{user `iso_url`}}",
+      "memory": "{{user `ram_size`}}",
+      "output_directory": "{{user `output_directory`}}",
+      "shutdown_command": "echo '{{user `username`}}' | sudo -S -E shutdown -P now",
+      "shutdown_timeout": "10m",
+      "ssh_password": "{{user `password`}}",
+      "ssh_timeout": "4h",
+      "ssh_username": "{{user `username`}}",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--graphicscontroller",
+          "vboxsvga"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--accelerate3d",
+          "on"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--vram",
+          "128"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--clipboard",
+          "bidirectional"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--draganddrop",
+          "bidirectional"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--usb",
+          "on"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--monitorcount",
+          "1"
+        ]
+      ],
+      "vm_name": "{{user `vm_name`}}"
+    }
+  ],
   "post-processors": [
     {
-      "type": "vagrant",
       "keep_input_artifact": true,
-      "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box"
+      "output": "./{{user `box_out_dir`}}/{{.Provider}}-{{user `output_name`}}.box",
+      "type": "vagrant"
     }
-  ]
+  ],
+  "provisioners": [
+    {
+      "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+      "only": [
+        "virtualbox-iso"
+      ],
+      "scripts": [
+        "./scripts/virtualbox.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "environment_vars": [
+        "SSH_USERNAME={{user `username`}}",
+        "LOCALE={{user `locale`}}"
+      ],
+      "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+      "expect_disconnect": true,
+      "scripts": [
+        "./scripts/update.sh",
+        "./scripts/vagrant.sh",
+        "./scripts/disable-daily-update.sh",
+        "./scripts/ansible.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "environment_vars": [
+        "LOCALE={{user `locale`}}"
+      ],
+      "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+      "expect_disconnect": true,
+      "script": "./scripts/fix-locale.sh",
+      "type": "shell"
+    },
+    {
+      "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash {{.Path}}",
+      "pause_before": "10s",
+      "script": "./scripts/cleanup.sh",
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "box_out_dir": "./dist/",
+    "cpu": "2",
+    "disk_size": "200000",
+    "hyperv_switchname": "{{env `hyperv_switchname`}}",
+    "initrd": "/install/initrd.gz",
+    "iso_checksum_type": "sha1",
+    "iso_checksum_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/SHA1SUMS",
+    "iso_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04-legacy-server-amd64.iso",
+    "keyboard_layout": "USA",
+    "keyboard_variant": "us",
+    "locale": "en_US.UTF-8",
+    "output_directory": "./output-ubuntu-20.04/",
+    "output_name": "ubuntu-focal",
+    "password": "vagrant",
+    "ram_size": "2048",
+    "username": "vagrant",
+    "vm_name": "ubuntu-focal",
+    "vmlinuz": "/install/vmlinuz"
+  }
 }
+
