@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: curl -s https://raw.githubusercontent.com/yar05/hashicorp-latest-bin/master/get-latest-bin.sh | bash /dev/stdin -p packer
+- script: ./install-latest-packer.sh
   displayName: 'Install packer'
 
 - script: packer validate ubuntu.json
