@@ -5,7 +5,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: ./install-latest-packer.sh
+- script: |
+    chmod +x install-latest-packer.sh
+    ./install-latest-packer.sh
   displayName: 'Install packer'
 
 - script: packer validate ubuntu.json
