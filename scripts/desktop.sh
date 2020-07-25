@@ -6,6 +6,8 @@ echo "==> SSH_USER set to ${SSH_USER}"
 echo "==> Installing ubuntu-desktop"
 apt-get install -y ubuntu-desktop
 
+echo "==> Disabling initial setup wizard"
+apt-get purge -y gnome-initial-setup
 
 echo "==> Configuring gdm for automatic login"
 GDM_CUSTOM_CONFIG=/etc/gdm3/custom.conf
