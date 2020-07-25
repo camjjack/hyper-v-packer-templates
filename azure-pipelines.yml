@@ -14,12 +14,12 @@ steps:
   displayName: 'Run packer validate on ubuntu'
 
 - script: |
-    mkdir output-ubuntu-20.04/
+    mkdir output-ubuntu-20.04
     packer validate ubuntu-desktop.json
   displayName: 'Run packer validate on ubuntu-desktop'
 
 - script: |
-    mkdir output-ubuntu-20.04-desktop-hvsocket/packer-hyperv-vmcx/
+    mkdir -p output-ubuntu-20.04-desktop-hvsocket/packer-hyperv-vmcx
     packer validate ubuntu-enhanced.json
   displayName: 'Run packer validate on ubuntu-enhanced'
 
