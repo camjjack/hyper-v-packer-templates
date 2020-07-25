@@ -30,7 +30,7 @@ jobs:
     vmImage: 'windows-latest'
 
   steps:
-  - script: |
+  - powershell: |
       $ChocoInstallPath = "$env:SystemDrive\ProgramData\Chocolatey\bin"
 
       if (!(Test-Path $ChocoInstallPath)) {
