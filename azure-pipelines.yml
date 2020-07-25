@@ -30,6 +30,9 @@ jobs:
     vmImage: 'windows-latest'
 
   steps:
+  - powershell: Install-WindowsFeature -Name Hyper-V-PowerShell
+    displayName: 'Install Hyper-V Powershell module'
+
   - powershell: |
       $ChocoInstallPath = "$env:SystemDrive\ProgramData\Chocolatey\bin"
 
@@ -40,10 +43,7 @@ jobs:
     displayName: 'Install packer'
 
   - powershell: & "./windows/scripts/mkiso.ps1" -Source './windows/answer_files/autounattend.xml', './windows/floppy/' -OutPath './windows/iso/floppy.iso' -Force
-    displayName: 'Build flopy'
-
-    
-
+    displayName: 'Build floppy'
 
   - script: packer validate hyperv-windows-10.json
     displayName: 'Run packer validate on windows-10'
