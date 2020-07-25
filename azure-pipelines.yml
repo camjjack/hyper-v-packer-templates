@@ -2,7 +2,7 @@ trigger:
 - master
 
 jobs:
--job: Linux
+- job: Linux
   pool:
     vmImage: 'ubuntu-latest'
 
@@ -25,7 +25,7 @@ jobs:
       packer validate ubuntu-enhanced.json
     displayName: 'Run packer validate on ubuntu-enhanced'
 
--job: Windows
+- job: Windows
   pool:
     vmImage: 'windows-latest'
 
