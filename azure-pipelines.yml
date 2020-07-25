@@ -39,7 +39,7 @@ jobs:
       choco install packer
     displayName: 'Install packer'
 
-  - powershell: & "./windows/scripts/mkiso.ps1" -Source './windows/answer_files/autounattend.xml', './windows/floppy/' -OutPath './windows/iso/floppy.iso' -Force
+  - powershell: ./windows/scripts/mkiso.ps1 -Source './windows/answer_files/autounattend.xml', './windows/floppy/' -OutPath './windows/iso/floppy.iso' -Force
     displayName: 'Build flopy'
 
     
