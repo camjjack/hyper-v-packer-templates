@@ -1,0 +1,25 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: curl -s https://raw.githubusercontent.com/yar05/hashicorp-latest-bin/master/get-latest-bin.sh | bash /dev/stdin -p packer
+  displayName: 'Install packer'
+
+- script: packer validate ubuntu.json
+  displayName: 'Run packer validate on ubuntu'
+
+- script: |
+    mkdir output-ubuntu-20.04/
+    packer validate ubuntu-desktop.json
+  displayName: 'Run packer validate on ubuntu-desktop'
+
+- script: |
+    mkdir output-ubuntu-20.04-desktop-hvsocket/packer-hyperv-vmcx/
+    packer validate ubuntu-enhanced.json
+  displayName: 'Run packer validate on ubuntu-enhanced'
+
+- script: packer validate hyperv-windows-10.json
+  displayName: 'Run packer validate on windows-10'
