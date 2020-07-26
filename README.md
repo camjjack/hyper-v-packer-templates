@@ -1,6 +1,8 @@
+[![Build Status](https://dev.azure.com/camjjack/camjjack/_apis/build/status/camjjack.hyper-v-packer-templates?branchName=master)](https://dev.azure.com/camjjack/camjjack/_build/latest?definitionId=2&branchName=master)
+
 # Hyper-V packer templates
 
-This project aims to expose a simple, configurable and tailored packer template for building Vagrant base boxes for Hyper-V. 
+This project aims to expose a simple, configurable and tailored packer template for building Vagrant base boxes for Hyper-V (and VirtualBox). 
 
 ## Why another template project
 There are many templates, and existing Vagrant boxes available so why bother re-inventing the wheel? Well in my experience all the projects I looked at either tried to do too much or had Hyper-V as a second class citizen. Further more if I wanted to configure the build boxes I had to fully understand the project and where it's configuration is hidden.
