@@ -4,8 +4,8 @@ debug=
 log_path=packer-log.txt
 
 box_out_dir="dist"
-base_json="ubuntu.json"
-desktop_json="ubuntu-desktop.json"
+base_template="ubuntu.pkr.hcl"
+desktop_template="ubuntu-desktop.pkr.hcl"
 
 
 output_name_prefix="output-ubuntu"
@@ -105,7 +105,7 @@ if [ ! -f $base_box_location ]; then
     args+=("--only=virtualbox-iso")
     args+=("${base_args[@]}")
     args+=("${server_args[@]}")
-    args+=("$base_json")
+    args+=("$base_template")
     echo ${args[@]}
     eval ${args[@]}
 fi
@@ -123,7 +123,7 @@ if [ ! -f $desktop_box_location ]; then
     args+=("--only=virtualbox-ovf")
     args+=("${base_args[@]}")
     args+=("${desktop_args[@]}")
-    args+=("$desktop_json")
+    args+=("$desktop_template")
     echo ${args[@]}
     eval ${args[@]}
 fi
