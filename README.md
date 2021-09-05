@@ -13,15 +13,21 @@ So the goals for this project are simple:
 1. Make anything that a user might want to modify configurable within a build process without the need to resort to modifing templates or internal OS installation files etc.
 
 ## Prerequisites
+
+### Windows host (Hyper-V)
 1. Packer
 1. PowerShell - for our build scripts
 1. Hyper-V
     1. Windows 10 build 17063 or greater is required for enhanced mode support. See https://blogs.technet.microsoft.com/virtualization/2018/02/28/sneak-peek-taking-a-spin-with-enhanced-linux-vms/
-1. Intel CPU with VT-X - needed for nested virtualization. If you do not have a supported CPU set `enable_virtualization_extensions` to `false` in `hyperv-windows-10.json`
+1. Intel CPU with VT-X - needed for nested virtualization. If you do not have a supported CPU pass `-disableVirtualization` to `build-windows.ps1`
+
+### Linux host (Virtualbox)
+1. Packer
+1. Virtualbox
 
 ## Usage
 
-### Ubuntu 20.04 x64
+### Ubuntu 20.04 x64 on Windows host
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
@@ -35,7 +41,7 @@ A default build can be run like this:
 .\build.ps1
 ```
 
-### Windows 10 x64
+### Windows 10 x64 on Windows host
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
@@ -49,8 +55,34 @@ A default build can be run like this:
 .\build-windows.ps1
 ```
 
+### Ubuntu 20.04 x64 on Linux host
+A bash script has been created to handle build and configuration for the vagrant boxes.
+
+```
+./build.sh -h
+```
+This will show all the configuration options available. 
+
+A default build can be run like this:
+```
+./build.sh
+```
+
+### Windows 10 x64 on Linux host
+A bash script has been created to handle build and configuration for the vagrant boxes.
+
+```
+./build-windows.sh -h
+```
+This will show all the configuration options available. 
+
+A default build can be run like this:
+```
+./build-windows.sh
+```
+
 ## Supported packer boxes
-In keeping with my project goals above, Ubuntu 20.04 x64 and Windows 10 x64 (2004) are the only supported box OS's at this stage.
+In keeping with my project goals above, Ubuntu 20.04 x64 and Windows 10 x64 are the only supported box OS's at this stage.
 
 ## Troubleshooting
 The build script has a -debug option which sets some packer options to aid in debugging faulty templates. Start with the generated log file: packer-log.txt
