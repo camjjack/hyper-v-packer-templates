@@ -75,13 +75,6 @@ build {
     scripts           = ["./scripts/update.sh", "./scripts/vagrant.sh", "./scripts/disable-daily-update.sh", "./scripts/ansible.sh"]
   }
 
-  #provisioner "shell" {
-  #  environment_vars  = ["LOCALE=${var.locale}"]
-  #  execute_command   = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
-  #  expect_disconnect = true
-  #  script            = "./scripts/fix-locale.sh"
-  #}
-
   provisioner "shell" {
     execute_command = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     pause_before    = "10s"
