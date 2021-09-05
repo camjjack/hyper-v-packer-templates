@@ -17,13 +17,11 @@ build {
   provisioner "shell" {
     execute_command   = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     expect_disconnect = true
-    only              = ["hyperv-vmcx"]
     scripts           = ["./scripts/update.sh", "./scripts/hyperv-enhanced.sh"]
   }
 
   provisioner "shell" {
     execute_command = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
-    only            = ["hyperv-vmcx"]
     pause_before    = "10s"
     scripts         = ["./scripts/hyperv-enhanced-after-reboot.sh", "./scripts/cleanup.sh"]
   }
