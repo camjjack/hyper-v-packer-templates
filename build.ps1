@@ -49,9 +49,6 @@ param([string]$outputNamePrefix = "output-ubuntu-20.04",
 #### Configuration
 $packer_exe = 'packer.exe'
 $vagrant_exe = 'vagrant.exe'
-$base_json = './ubuntu.json'
-$desktop_json = './ubuntu-desktop.json'
-$enhanced_json = './ubuntu-enhanced.json'
 $box_out_dir = 'dist'
 
 # Vm names and locations based on the prefixes given as a parameter.
@@ -63,9 +60,9 @@ $enhanced_out_location = './{0}-enhanced/' -f $outputNamePrefix
 $enhanced_vm_name = '{0}-enhanced' -f $vmNamePrefix
 
 # Box file location based on the names given as a paramter
-$base_box_location = './{0}/hyperv-{1}.box' -f $box_out_dir, $vmNamePrefix
-$desktop_box_location = './{0}/hyperv-{1}-desktop.box' -f $box_out_dir, $vmNamePrefix
-$enhanced_box_location = './{0}/hyperv-{1}-enhanced.box' -f $box_out_dir, $vmNamePrefix
+$base_box_location = './{0}/hyperv-iso-{1}.box' -f $box_out_dir, $vmNamePrefix
+$desktop_box_location = './{0}/hyperv-vmcx-{1}-desktop.box' -f $box_out_dir, $vmNamePrefix
+$enhanced_box_location = './{0}/hyperv-vmcx-{1}-enhanced.box' -f $box_out_dir, $vmNamePrefix
 
 #### End configuration
 
@@ -75,7 +72,6 @@ $base_args += '-var "ram_size={0}"' -f $ramSize
 $base_args += '-var "disk_size={0}"' -f $diskSize
 $base_args += '-var "username={0}"' -f $username
 $base_args += '-var "box_out_dir={0}"' -f $box_out_dir
-$base_args += '-var "tmp={0}\{1}"' -f $PSScriptRoot, "tmp"
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'
@@ -108,10 +104,10 @@ if (-not (Test-Path $base_box_location)) {
     $server_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_directory={0}"' -f $base_out_location
-    $server_args += '--only=hyperv-iso'
+    $server_args += '--only=*hyperv-iso*'
 
     $server_args += $base_args
-    $server_args += $base_json
+    $server_args += '.'
 
     $build_server = Start-Process -FilePath $packer_exe -ArgumentList $server_args -NoNewWindow -PassThru -Wait
 
@@ -135,9 +131,9 @@ if (-not (Test-Path $desktop_box_location)) {
     $desktop_args += '-var "output_name={0}"' -f $desktop_vm_name
     $desktop_args += '-var "output_directory={0}"' -f $desktop_out_location
     $desktop_args += '-var "input_directory={0}"' -f $base_out_location
-    $desktop_args += '--only=hyperv-vmcx'
+    $desktop_args += '--only=*hyperv-vmcx.ubuntu-desktop'
     $desktop_args += $base_args
-    $desktop_args += $desktop_json
+    $desktop_args += '.'
 
     $build_desktop = Start-Process -FilePath $packer_exe -ArgumentList $desktop_args -NoNewWindow -PassThru -Wait
 
@@ -157,7 +153,7 @@ if (-not (Test-Path $enhanced_box_location)) {
     $input_dir = Join-Path -Path $desktop_hvsocket_out_location -ChildPath $enhanced_vm_name
     if (-not (Test-Path $input_dir)) {
         Write-Output -InputObject "Changing desktop vm to use hvsocket for enhanced session transport"
-        & "./setup-enhanced-transport-type.ps1" -Path $desktop_out_location -OutPath $desktop_hvsocket_out_location -VmName $vmNamePrefix -OutVmName $enhanced_vm_name
+        & "./setup-enhanced-transport-type.ps1" -Path $desktop_out_location -OutPath $desktop_hvsocket_out_location -VmName $vmNamePrefix-desktop -OutVmName $enhanced_vm_name
         if (-not $?) {
             Write-Error -Message "setup-enhanced-transport-type failed"
             exit 1
@@ -170,9 +166,9 @@ if (-not (Test-Path $enhanced_box_location)) {
     $enhanced_args += '-var "output_name={0}"' -f $enhanced_vm_name
     $enhanced_args += '-var "output_directory={0}"' -f $enhanced_out_location
     $enhanced_args += '-var "input_directory={0}"' -f $input_dir
-    $enhanced_args += '--only=hyperv-vmcx'
+    $enhanced_args += '--only=*hyperv-vmcx.ubuntu-enhanced'
     $enhanced_args += $base_args
-    $enhanced_args += $enhanced_json
+    $enhanced_args += '.'
 
     $build_enhanced = Start-Process -FilePath $packer_exe -ArgumentList $enhanced_args -NoNewWindow -PassThru -Wait
 
@@ -185,8 +181,9 @@ if (-not (Test-Path $enhanced_box_location)) {
 
 if ($vagrantAdd) {
     $enhanced_vagrant_args = $vagrant_add_args
-    $enhanced_vagrant_args += '--name "{0}"' -f $vmNamePrefix
-    $enhanced_vagrant_args += '{0}\hyperv-{1}.box' -f $box_out_dir, $enhanced_vm_name
+    $enhanced_vagrant_args += '--name "{0}" --provider hyperv --force' -f $vmNamePrefix
+    $enhanced_vagrant_args += '{0}\hyperv-vmcx-{1}.box' -f $box_out_dir, $enhanced_vm_name
+
     $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $enhanced_vagrant_args -NoNewWindow -PassThru -Wait
 
     if ($add_server.ExitCode -ne 0) {

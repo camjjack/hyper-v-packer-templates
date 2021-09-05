@@ -4,7 +4,6 @@ debug=
 log_path=packer-log.txt
 
 box_out_dir="dist"
-base_json="hyperv-windows-10.json"
 
 
 output_name_prefix="output-windows-10"
@@ -89,7 +88,7 @@ fi
 # Vm names and locations based on the prefixes given as a parameter.
 base_out_location=$output_name_prefix
 
-base_box_location="$box_out_dir/virtualbox-$vm_name_prefix.box"
+base_box_location="$box_out_dir/virtualbox-iso-$vm_name_prefix.box"
 if [ ! -f $base_box_location ]; then
     echo "Building base image"
     
@@ -99,10 +98,10 @@ if [ ! -f $base_box_location ]; then
 
     args=("packer")
     args+=("build")
-    args+=("--only=virtualbox-iso")
+    args+=("--only=*virtualbox-iso.windows")
     args+=("${base_args[@]}")
     args+=("${win10_args[@]}")
-    args+=("$base_json")
+    args+=(".")
     echo ${args[@]}
     export TMPDIR=/var/tmp/
     eval ${args[@]}
