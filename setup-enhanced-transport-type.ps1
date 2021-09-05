@@ -23,11 +23,14 @@ $vmcx = Get-Item -Path $vmcx_path
 
 $VirtualHarddisksPath = Join-Path -Path $OutPath -ChildPath 'Virtual Hard Disks'
 
-Write-Output -InputObject "Importing Desktop VM"
-Import-VM -Path $vmcx -VirtualMachinePath $OutPath -VhdDestinationPath $VirtualHarddisksPath -Copy
+Get-VM -Name $VmName
 if (-not $?) {
-    Write-Error -Message "Failed to Import Desktop VM"
-    exit 1
+    Write-Output -InputObject "Importing Desktop VM"
+    Import-VM -Path $vmcx -VirtualMachinePath $OutPath -VhdDestinationPath $VirtualHarddisksPath -Copy
+    if (-not $?) {
+        Write-Error -Message "Failed to Import Desktop VM"
+        exit 1
+    }
 }
 
 if (-$?) {
