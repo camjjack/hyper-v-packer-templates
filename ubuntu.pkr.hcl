@@ -30,7 +30,28 @@ source "hyperv-iso" "ubuntu" {
 }
 
 source "virtualbox-iso" "ubuntu" {
-  boot_command     = ["<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>", "/casper/vmlinuz ", "initrd=${var.initrd} ", "autoinstall ds=no-cloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/<enter>"]
+  boot_command     = [
+
+    # Make the language selector appear...
+    " <up><wait>",
+    # ...then get rid of it
+    " <up><wait><esc><wait>",
+
+    # Go to the other installation options menu and leave it
+    "<f6><wait><esc><wait>",
+
+    # Remove the kernel command-line that already exists
+    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+
+    # Add kernel command-line and start install
+    "/casper/vmlinuz ",
+    "initrd=/casper/initrd ",
+    "autoinstall ",
+    "ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/ ",
+    "<enter>"
+  ]
   boot_wait        = "3s"
   communicator     = "ssh"
   cpus             = "${var.cpu}"

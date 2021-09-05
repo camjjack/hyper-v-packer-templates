@@ -4,8 +4,6 @@ debug=
 log_path=packer-log.txt
 
 box_out_dir="dist"
-base_template="ubuntu.pkr.hcl"
-desktop_template="ubuntu-desktop.pkr.hcl"
 
 
 output_name_prefix="output-ubuntu"
@@ -102,10 +100,10 @@ if [ ! -f $base_box_location ]; then
 
     args=("packer")
     args+=("build")
-    args+=("--only=virtualbox-iso")
+    args+=("--only=*virtualbox-iso.ubuntu")
     args+=("${base_args[@]}")
     args+=("${server_args[@]}")
-    args+=("$base_template")
+    args+=(".")
     echo ${args[@]}
     eval ${args[@]}
 fi
@@ -120,10 +118,10 @@ if [ ! -f $desktop_box_location ]; then
     desktop_args+=("-var \"input_directory=$base_out_location\"")
     args=("packer")
     args+=("build")
-    args+=("--only=virtualbox-ovf")
+    args+=("--only=*virtualbox-ovf.ubuntu-desktop")
     args+=("${base_args[@]}")
     args+=("${desktop_args[@]}")
-    args+=("$desktop_template")
+    args+=(".")
     echo ${args[@]}
     eval ${args[@]}
 fi
