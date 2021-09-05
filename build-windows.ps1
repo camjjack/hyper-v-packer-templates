@@ -15,6 +15,8 @@
     The size of the hard disk drive in bytes used in the VM. Default: 200000
 .PARAMETER username
     The username for the VM. For simplicity the password will be set as the username. Default: vagrant
+.PARAMETER disableVirtualization
+    Disable nested virtualization.
 .PARAMETER clean
     Cleans up all the artifacts of the build process.
 .PARAMETER force
@@ -33,6 +35,7 @@ param([string]$outputNamePrefix = "output-windows-10",
       [string]$ramSize = "4096",
       [string]$diskSize = "200000",
       [string]$username = "vagrant",
+      [switch]$disableVirtualization = $false,
       [switch]$clean = $false,
       [switch]$force = $false,
       [switch]$debug = $false,
@@ -42,14 +45,13 @@ param([string]$outputNamePrefix = "output-windows-10",
 #### Configuration
 $packer_exe = "packer.exe"
 $vagrant_exe = 'vagrant.exe'
-$base_json = './hyperv-windows-10.json'
 $box_out_dir = './dist/'
 
 # Vm names and locations based on the prefixes given as a parameter.
 $base_out_location = './{0}/' -f $outputNamePrefix
 
 # Box file location based on the names given as a paramter
-$base_box_location = './{0}/hyperv-{1}.box' -f $box_out_dir, $vmNamePrefix
+$base_box_location = './{0}/hyperv-iso-{1}.box' -f $box_out_dir, $vmNamePrefix
 
 # base parameter arguments to be used for all packer build commands
 $base_args = @('-var "cpu={0}"' -f $cpus)
@@ -57,10 +59,12 @@ $base_args += '-var "ram_size={0}"' -f $ramSize
 $base_args += '-var "disk_size={0}"' -f $diskSize
 $base_args += '-var "username={0}"' -f $username
 $base_args += '-var "box_out_dir={0}"' -f $box_out_dir
-$base_args += '-var "tmp={0}\{1}"' -f $PSScriptRoot, "tmp"
 if ($debug) {
     $base_args += '--debug'
     $base_args += '--on-error=ask'
+}
+if ($disableVirtualization) {
+    $base_args += '-var "windows_disable_virtualization=true"'
 }
 
 if ($verbose -or $debug) {
@@ -99,10 +103,10 @@ if (-not (Test-Path $base_box_location)) {
     $win10_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $win10_args += '-var "output_name={0}"' -f $vmNamePrefix
     $win10_args += '-var "output_directory={0}"' -f $base_out_location
-    $win10_args += '--only=hyperv-iso'
+    $win10_args += '--only=*hyperv-iso.windows'
 
     $win10_args += $base_args
-    $win10_args += $base_json
+    $win10_args += "."
 
     $build_server = Start-Process -FilePath $packer_exe -ArgumentList $win10_args -NoNewWindow -PassThru -Wait
 

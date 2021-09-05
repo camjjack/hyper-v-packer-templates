@@ -101,3 +101,27 @@ variable "input_name" {
   type    = string
   default = "ubuntu-20.04"
 }
+
+variable "windows_iso_checksum" {
+  type    = string
+  default = "026607e7aa7ff80441045d8830556bf8899062ca9b3c543702f112dd6ffe6078"
+}
+
+variable "windows_iso_url" {
+  type    = string
+  default = "https://software-download.microsoft.com/download/sg/19043.928.210409-1212.21h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso"
+}
+
+variable "windows_output_directory" {
+  type    = string
+  default = "./output-windows-10/"
+}
+
+variable "windows_vm_name" {
+  type    = string
+  default = "windows-10"
+}
+
+variable "windows_disable_virtualization" {
+  default = true
+}
