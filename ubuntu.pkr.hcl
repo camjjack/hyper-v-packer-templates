@@ -1,5 +1,14 @@
+packer {
+  required_plugins {
+    #hyperv = {
+    #  version = ">= 1.0.2"
+    #  source  = "github.com/hashicorp/hyperv"
+    #}
+  }
+}
+
 source "hyperv-iso" "ubuntu" {
-  boot_command         = ["<esc><wait1>", "set gfxpayload=keep<enter>", "linux /casper/vmlinuz quiet autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\"  ---<enter>",  "initrd /casper/initrd<enter>", "boot<enter>"]
+  boot_command         = ["<esc><wait1>", "set gfxpayload=keep<enter>", "linux /casper/vmlinuz quiet autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\"  ---<enter>", "initrd /casper/initrd<enter>", "boot<enter>"]
   boot_wait            = "3s"
   communicator         = "ssh"
   cpus                 = var.cpu
@@ -7,30 +16,30 @@ source "hyperv-iso" "ubuntu" {
   enable_secure_boot   = false
   generation           = 2
   guest_additions_mode = "disable"
-  http_content         = {
-    "/user-data" = templatefile("${path.root}/templates/user-data.pkrtpl.hcl",  {
-        username = var.username
-        password = var.crypted_password
-        hostname = var.vm_name
-        locale = var.locale
-        keyboard_layout = var.keyboard_layout
-      })
+  http_content = {
+    "/user-data" = templatefile("./templates/user-data.pkrtpl.hcl", {
+      username        = var.username
+      password        = var.crypted_password
+      hostname        = var.vm_name
+      locale          = var.locale
+      keyboard_layout = var.keyboard_layout
+    })
     "/meta-data" = ""
   }
-  iso_checksum         = "file:${var.iso_checksum_url}"
-  iso_url              = var.iso_url
-  memory               = var.ram_size
-  output_directory     = var.output_directory
-  shutdown_command     = "echo '${var.username}' | sudo -S -E shutdown -P now"
-  ssh_password         = var.password
-  ssh_timeout          = "4h"
-  ssh_username         = var.username
-  switch_name          = var.hyperv_switchname
-  vm_name              = var.vm_name
+  iso_checksum     = "file:${var.iso_checksum_url}"
+  iso_url          = var.iso_url
+  memory           = var.ram_size
+  output_directory = var.output_directory
+  shutdown_command = "echo '${var.username}' | sudo -S -E shutdown -P now"
+  ssh_password     = var.password
+  ssh_timeout      = "4h"
+  ssh_username     = var.username
+  switch_name      = var.hyperv_switchname
+  vm_name          = var.vm_name
 }
 
 source "virtualbox-iso" "ubuntu" {
-  boot_command     = [
+  boot_command = [
 
     # Make the language selector appear...
     " <up><wait>",
@@ -52,19 +61,19 @@ source "virtualbox-iso" "ubuntu" {
     "ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/ ",
     "<enter>"
   ]
-  boot_wait        = "3s"
-  communicator     = "ssh"
-  cpus             = "${var.cpu}"
-  disk_size        = "${var.disk_size}"
-  guest_os_type    = "Ubuntu_64"
-  http_content         = {
-    "/user-data" = templatefile("${path.root}/templates/user-data.pkrtpl.hcl",  {
-        username = var.username
-        password = var.crypted_password
-        hostname = var.vm_name
-        locale = var.locale
-        keyboard_layout = var.keyboard_layout
-      })
+  boot_wait     = "3s"
+  communicator  = "ssh"
+  cpus          = "${var.cpu}"
+  disk_size     = "${var.disk_size}"
+  guest_os_type = "Ubuntu_64"
+  http_content = {
+    "/user-data" = templatefile("./templates/user-data.pkrtpl.hcl", {
+      username        = var.username
+      password        = var.crypted_password
+      hostname        = var.vm_name
+      locale          = var.locale
+      keyboard_layout = var.keyboard_layout
+    })
     "/meta-data" = ""
   }
   iso_checksum     = "file:${var.iso_checksum_url}"
@@ -86,24 +95,24 @@ build {
   provisioner "shell" {
     execute_command = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     only            = ["virtualbox-iso"]
-    scripts         = ["./scripts/virtualbox.sh"]
+    scripts         = ["${path.root}/scripts/ubuntu/virtualbox.sh"]
   }
 
   provisioner "shell" {
     environment_vars  = ["SSH_USERNAME=${var.username}", "LOCALE=${var.locale}"]
     execute_command   = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     expect_disconnect = true
-    scripts           = ["./scripts/update.sh", "./scripts/vagrant.sh", "./scripts/disable-daily-update.sh", "./scripts/ansible.sh"]
+    scripts           = ["${path.root}/scripts/ubuntu/update.sh", "${path.root}/scripts/ubuntu/vagrant.sh", "${path.root}/scripts/ubuntu/disable-daily-update.sh", "${path.root}/scripts/ubuntu/ansible.sh"]
   }
 
   provisioner "shell" {
     execute_command = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     pause_before    = "10s"
-    script          = "./scripts/cleanup.sh"
+    script          = "${path.root}/scripts/ubuntu/cleanup.sh"
   }
 
   post-processor "vagrant" {
     keep_input_artifact = true
-    output              = "./${var.box_out_dir}/${source.type}-${var.output_name}.box"
+    output              = "${path.root}/${var.box_out_dir}/${source.type}-${var.output_name}.box"
   }
 }

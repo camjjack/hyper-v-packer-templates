@@ -15,7 +15,7 @@ variable "disk_size" {
 
 variable "hyperv_switchname" {
   type    = string
-  default = "Default Switch"
+  default = "WSL"
 }
 
 variable "initrd" {
@@ -38,11 +38,6 @@ variable "iso_url" {
   default = "https://releases.ubuntu.com/20.04/ubuntu-20.04.3-live-server-amd64.iso"
 }
 
-#variable "keyboard_layout" {
-#  type    = string
-#  default = "USA"
-#}
-
 variable "keyboard_layout" {
   type    = string
   default = "us"
@@ -55,28 +50,28 @@ variable "locale" {
 
 variable "output_directory" {
   type    = string
-  default = "./output-ubuntu-20.04/"
+  default = "./output/ubuntu-20.04/"
 }
 
 variable "output_name" {
   type    = string
-  default = "ubuntu-focal"
+  default = "ubuntu"
 }
 
 variable "password" {
   type    = string
-  default = "vagrant" #vagrant
+  default = "vagrant"
 }
 
 variable "crypted_password" {
-  type    = string
+  type        = string
   description = "openssl passwd -6 password. must match password from above"
-  default = "$6$5rFpim1KqZfBwzhD$XIwSTmg2rjrzFSX9qcBUs2atswKmwHvMz4RZS8Cmb7gMf5ZmSpcv7q.G3.FW/K5adDoc6BwQSaGxuyBd25gl21" #vagrant
+  default     = "$6$5rFpim1KqZfBwzhD$XIwSTmg2rjrzFSX9qcBUs2atswKmwHvMz4RZS8Cmb7gMf5ZmSpcv7q.G3.FW/K5adDoc6BwQSaGxuyBd25gl21" #vagrant
 }
 
 variable "ram_size" {
   type    = string
-  default = "2048"
+  default = "4096"
 }
 
 variable "username" {
@@ -86,7 +81,7 @@ variable "username" {
 
 variable "vm_name" {
   type    = string
-  default = "ubuntu-focal"
+  default = "ubuntu"
 }
 
 variable "vmlinuz" {
@@ -95,33 +90,19 @@ variable "vmlinuz" {
 }
 variable "input_directory" {
   type    = string
-  default = "./output-ubuntu-20.04/"
+  default = "./output/ubuntu-20.04/"
 }
 variable "input_name" {
   type    = string
   default = "ubuntu-20.04"
 }
 
-variable "windows_iso_checksum" {
+variable "timezone_region" {
   type    = string
-  default = "026607e7aa7ff80441045d8830556bf8899062ca9b3c543702f112dd6ffe6078"
+  default = "Australia"
 }
 
-variable "windows_iso_url" {
+variable "timezone_city" {
   type    = string
-  default = "https://software-download.microsoft.com/download/sg/19043.928.210409-1212.21h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso"
-}
-
-variable "windows_output_directory" {
-  type    = string
-  default = "./output-windows-10/"
-}
-
-variable "windows_vm_name" {
-  type    = string
-  default = "windows-10"
-}
-
-variable "windows_disable_virtualization" {
-  default = true
+  default = "Sydney"
 }

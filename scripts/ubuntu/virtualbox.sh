@@ -11,4 +11,3 @@ echo "==> Ran guest additions"
 umount /mnt
 rm ~/VBoxGuestAdditions.iso
 echo "==> unmounted and removed VirtualBox guest additions iso"
-

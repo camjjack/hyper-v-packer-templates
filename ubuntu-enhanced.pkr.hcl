@@ -17,17 +17,17 @@ build {
   provisioner "shell" {
     execute_command   = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     expect_disconnect = true
-    scripts           = ["./scripts/update.sh", "./scripts/hyperv-enhanced.sh"]
+    scripts           = ["${path.root}/scripts/ubuntu/update.sh", "${path.root}/scripts/ubuntu/hyperv-enhanced.sh"]
   }
 
   provisioner "shell" {
     execute_command = "echo '${var.password}' | {{ .Vars }} sudo -S -E bash {{ .Path }}"
     pause_before    = "10s"
-    scripts         = ["./scripts/hyperv-enhanced-after-reboot.sh", "./scripts/cleanup.sh"]
+    scripts         = ["${path.root}/scripts/ubuntu/hyperv-enhanced-after-reboot.sh", "${path.root}/scripts/ubuntu/cleanup.sh"]
   }
 
   post-processor "vagrant" {
     keep_input_artifact = true
-    output              = "./${var.box_out_dir}/${source.type}-${var.output_name}.box"
+    output              = "${path.root}/${var.box_out_dir}/${source.type}-${var.output_name}.box"
   }
 }
