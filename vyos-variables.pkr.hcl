@@ -35,27 +35,27 @@ variable "vyos_disk_size" {
 
 variable "vyos_ip" {
   type    = string
-  default = "172.21.70.1"
+  default = "172.19.139.1"
 }
 
 variable "vyos_host_ip" {
   type    = string
-  default = "172.21.64.1"
+  default = "172.19.128.1"
 }
 
 variable "vyos_subnet_range" {
   type    = string
-  default = "172.21.64.0/20"
+  default = "172.19.128.0/20"
 }
 
 variable "vyos_dhcp_start" {
   type    = string
-  default = "172.21.70.10"
+  default = "172.19.139.10"
 }
 
 variable "vyos_dhcp_end" {
   type    = string
-  default = "172.21.70.200"
+  default = "172.19.139.200"
 }
 
 variable "vyos_dns" {

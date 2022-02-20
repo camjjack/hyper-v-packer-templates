@@ -6,6 +6,8 @@
       1) Base Ubuntu 20.04 server
       2) Ubuntu 20.04 Desktop
       3) Ubuntu 20.04 Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
+      4) Base Arch Linux
+      5) Arch Linux with xorg and enhanced session support
     Also provides command line configuration for these builds.
 .PARAMETER outputNamePrefix
     The base name for the output directories. This is used to pass to following packer builds to generate the desktop and enhanced session boxes.
@@ -21,6 +23,8 @@
     The username for the VM. For simplicity the password will be set as the username. Default: vagrant
 .PARAMETER dontBuildDesktop
     Instructs the build process to just build a server os not the desktop boxes.
+.PARAMETER dontBuildArch
+    Instructs the build process to not build the arch boxes.
 .PARAMETER clean
     Cleans up all the artifacts of the build process.
 .PARAMETER force
@@ -40,6 +44,7 @@ param([string]$outputNamePrefix = "output-ubuntu-20.04",
       [string]$diskSize = "200000",
       [string]$username = "vagrant",
       [switch]$dontBuildDesktop = $false,
+      [switch]$dontBuildArch = $false,
       [switch]$clean = $false,
       [switch]$force = $false,
       [switch]$debug = $false,
@@ -63,6 +68,8 @@ $enhanced_vm_name = '{0}-enhanced' -f $vmNamePrefix
 $base_box_location = './{0}/hyperv-iso-{1}.box' -f $box_out_dir, $vmNamePrefix
 $desktop_box_location = './{0}/hyperv-vmcx-{1}-desktop.box' -f $box_out_dir, $vmNamePrefix
 $enhanced_box_location = './{0}/hyperv-vmcx-{1}-enhanced.box' -f $box_out_dir, $vmNamePrefix
+$arch_box_location = './{0}/hyperv-iso-arch.box' -f $box_out_dir
+$arch_desktop_box_location = './{0}/hyperv-vmcx-arch-desktop.box' -f $box_out_dir
 
 #### End configuration
 
@@ -104,7 +111,7 @@ if (-not (Test-Path $base_box_location)) {
     $server_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_name={0}"' -f $vmNamePrefix
     $server_args += '-var "output_directory={0}"' -f $base_out_location
-    $server_args += '--only=*hyperv-iso*'
+    $server_args += '--only=hyperv-iso.ubuntu'
 
     $server_args += $base_args
     $server_args += '.'
@@ -126,7 +133,7 @@ if (-not (Test-Path $desktop_box_location)) {
     Write-Output -InputObject "Starting packer build for Ubuntu desktop"
     $desktop_args = @('build')
     # VM name has to match that of the existing vmcx. We could import, rename and export like we do for the enhanced box below, but that seems
-    # like a lot of time for little gain assuming that you'll want to use the enhanced one anyway for its awesomness    
+    # like a lot of time for little gain assuming that you'll want to use the enhanced one anyway for its awesomness
     $desktop_args += '-var "vm_name={0}"' -f $vmNamePrefix
     $desktop_args += '-var "output_name={0}"' -f $desktop_vm_name
     $desktop_args += '-var "output_directory={0}"' -f $desktop_out_location
@@ -191,3 +198,60 @@ if ($vagrantAdd) {
         exit 1
     }
 }
+
+if($dontBuildArch) {
+    Write-Output -InputObject "Not building Arch images. We are done"
+    exit 0
+}
+
+if (-not (Test-Path $arch_box_location)) {
+    Write-Output -InputObject "Starting packer build for Arch"
+    $arch_args = @('build')
+    $arch_args += '--only=hyperv-iso.arch'
+
+    $arch_args += $base_args
+    $arch_args += '.'
+
+    $build_arch = Start-Process -FilePath $packer_exe -ArgumentList $arch_args -NoNewWindow -PassThru -Wait
+
+    if ($build_arch.ExitCode -ne 0) {
+        Write-Error -Message "Failed to build Arch image with packer"
+        exit 1
+    }
+}
+
+if (-not (Test-Path $arch_desktop_box_location)) {
+    
+    $version = [environment]::OSVersion.Version
+    if ($version.Major -ilt 10 -or $version.Build -ilt 17063) {
+        Write-Output -InputObject "Host is not on Build 17063 or greater so skipping enhanced mode build"
+    } else {
+        Write-Output -InputObject "Starting packer build for Arch desktop"
+        $desktop_args = @('build')
+        # VM name has to match that of the existing vmcx. We could import, rename and export like we do for the enhanced box below, but that seems
+        # like a lot of time for little gain assuming that you'll want to use the enhanced one anyway for its awesomness
+        $desktop_args += '--only=hyperv-vmcx.arch-desktop'
+        $desktop_args += $base_args
+        $desktop_args += '.'
+
+        $build_desktop = Start-Process -FilePath $packer_exe -ArgumentList $desktop_args -NoNewWindow -PassThru -Wait
+
+        if ($build_desktop.ExitCode -ne 0) {
+            Write-Error -Message "Failed to build desktop image with packer"
+            exit 1
+        }
+    }
+    
+    if ($vagrantAdd) {
+        $arch_desktop_vagrant_args = $vagrant_add_args
+        $arch_desktop_vagrant_args += '--name "{0}" --provider hyperv --force {1}' -f $vmNamePrefix, $arch_desktop_box_location
+
+        $add_arch = Start-Process -FilePath $vagrant_exe -ArgumentList $arch_desktop_vagrant_args -NoNewWindow -PassThru -Wait
+
+        if ($add_arch.ExitCode -ne 0) {
+            Write-Error -Message "Failed to add generated arch dekstop box file to Vagrant"
+            exit 1
+        }
+    }
+}
+

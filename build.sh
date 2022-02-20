@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-debug=
+debug=z
 log_path=packer-log.txt
 
 box_out_dir="dist"
@@ -93,7 +93,7 @@ desktop_vm_name="$vm_name_prefix-desktop"
 base_box_location="$box_out_dir/virtualbox-$vm_name_prefix.box"
 if [ ! -f $base_box_location ]; then
     echo "Building server base image"
-    
+
     server_args=("-var \"vm_name=$vm_name_prefix\"")
     server_args+=("-var \"output_name=$vm_name_prefix\"")
     server_args+=("-var \"output_directory=$base_out_location\"")

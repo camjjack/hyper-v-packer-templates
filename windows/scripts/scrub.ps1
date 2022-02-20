@@ -11,7 +11,7 @@ Try {
     $Stream= [io.File]::OpenWrite($SourceFile)
     $Stream.Write($ZeroArray,0, $ZeroArray.Length)
     $Stream.Close()
-    
+
     $count = 1
     Write-Output -InputObject "Creating many large files filled with 0's"
     while ((Get-WmiObject win32_volume | Where-Object {$_.name -eq "$root"}).Freespace -gt $size) {
@@ -27,4 +27,3 @@ Catch {
     Remove-Item "$($root)scrub*.tmp"
     Exit 1
   }
-

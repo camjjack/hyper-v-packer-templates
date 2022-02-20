@@ -9,7 +9,7 @@ packer {
 
 source "hyperv-iso" "ubuntu" {
   boot_command         = ["<esc><wait1>", "set gfxpayload=keep<enter>", "linux /casper/vmlinuz quiet autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\"  ---<enter>", "initrd /casper/initrd<enter>", "boot<enter>"]
-  boot_wait            = "3s"
+  boot_wait            = "5s"
   communicator         = "ssh"
   cpus                 = var.cpu
   disk_size            = var.disk_size

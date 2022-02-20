@@ -125,7 +125,7 @@ if (-not (Test-Path $base_box_location)) {
         $win10_vagrant_args += $base_box_location
 
         $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $win10_vagrant_args -NoNewWindow -PassThru -Wait
-    
+
         if ($add_server.ExitCode -ne 0) {
             Write-Error -Message "Failed to add generated box file to Vagrant"
             exit 1

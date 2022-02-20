@@ -2,7 +2,7 @@
 .SYNOPSIS
     Copies a Hyper-V vmcx and sets EnhancedSessionTransportType to HvSocket on the new vmcx
 .DESCRIPTION
-    Copies a Hyper-V vmcx and sets EnhancedSessionTransportType to HvSocket on the new vmcx. 
+    Copies a Hyper-V vmcx and sets EnhancedSessionTransportType to HvSocket on the new vmcx.
     Used to enable enhacned session on Ubuntu 16.04+ with Windows Insider builds. see: https://blogs.technet.microsoft.com/virtualization/2018/02/28/sneak-peek-taking-a-spin-with-enhanced-linux-vms/
 .PARAMETER Path
     The Path that contains the the base virtual machine to copy.

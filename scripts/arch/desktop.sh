@@ -2,7 +2,7 @@
 
 SSH_USER=${SSH_USERNAME:-vagrant}
 
-pacman -Sy --noconfirm xf86-video-fbdev xorg adobe-source-code-pro-fonts ttf-font-awesome lightdm lightdm-gtk-greeter alacritty vim dex pulseaudio feh picom
+pacman -Sy --noconfirm xf86-video-fbdev xorg adobe-source-code-pro-fonts ttf-font-awesome lightdm lightdm-gtk-greeter vim dex pulseaudio feh picom
 systemctl enable --now lightdm.service
 
 sudo -u ${SSH_USER} mkdir -p /home/${SSH_USER}/.config/

@@ -19,28 +19,28 @@ param(
       [switch]$Force,
       [string]$Title = (Get-Date).ToString("yyyyMMdd-HHmmss.ffff"))
 
-      ($cp = new-object System.CodeDom.Compiler.CompilerParameters).CompilerOptions = '/unsafe' 
-    if (!('ISOFile' -as [type])) {  
+      ($cp = new-object System.CodeDom.Compiler.CompilerParameters).CompilerOptions = '/unsafe'
+    if (!('ISOFile' -as [type])) {
       Add-Type -CompilerParameters $cp -TypeDefinition @"
-public class ISOFile  
-{ 
-  public unsafe static void Create(string Path, object Stream, int BlockSize, int TotalBlocks)  
-  {  
-    int bytes = 0;  
-    byte[] buf = new byte[BlockSize];  
-    var ptr = (System.IntPtr)(&bytes);  
-    var o = System.IO.File.OpenWrite(Path);  
-    var i = Stream as System.Runtime.InteropServices.ComTypes.IStream;  
-  
-    if (o != null) { 
-      while (TotalBlocks-- > 0) {  
-        i.Read(buf, BlockSize, ptr); o.Write(buf, 0, bytes);  
-      }  
-      o.Flush(); o.Close();  
-    } 
-  } 
-}  
-"@  
+public class ISOFile
+{
+  public unsafe static void Create(string Path, object Stream, int BlockSize, int TotalBlocks)
+  {
+    int bytes = 0;
+    byte[] buf = new byte[BlockSize];
+    var ptr = (System.IntPtr)(&bytes);
+    var o = System.IO.File.OpenWrite(Path);
+    var i = Stream as System.Runtime.InteropServices.ComTypes.IStream;
+
+    if (o != null) {
+      while (TotalBlocks-- > 0) {
+        i.Read(buf, BlockSize, ptr); o.Write(buf, 0, bytes);
+      }
+      o.Flush(); o.Close();
+    }
+  }
+}
+"@
     }
 
 $Image = New-Object -ComObject IMAPI2FS.MsftFileSystemImage
@@ -52,8 +52,8 @@ If(!(test-path $OutPath)) {
     $OutFile = New-Item -Path $OutPath -ItemType File -Force:$Force
 }
 
-foreach($itemStr in $Source) { 
-    $item = Get-Item -LiteralPath $itemStr 
+foreach($itemStr in $Source) {
+    $item = Get-Item -LiteralPath $itemStr
     try {
         $Image.Root.AddTree($item.FullName, $true)
     } catch {
@@ -61,6 +61,6 @@ foreach($itemStr in $Source) {
     }
 }
 $Result = $Image.CreateResultImage()
-[ISOFile]::Create($OutFile.FullName,$Result.ImageStream,$Result.BlockSize,$Result.TotalBlocks) 
-Write-Verbose -Message "Target image ($($OutFile.FullName)) has been created" 
+[ISOFile]::Create($OutFile.FullName,$Result.ImageStream,$Result.BlockSize,$Result.TotalBlocks)
+Write-Verbose -Message "Target image ($($OutFile.FullName)) has been created"
 $OutFile

@@ -91,7 +91,7 @@ base_out_location=$output_name_prefix
 base_box_location="$box_out_dir/virtualbox-iso-$vm_name_prefix.box"
 if [ ! -f $base_box_location ]; then
     echo "Building base image"
-    
+
     win10_args=("-var \"vm_name=$vm_name_prefix\"")
     win10_args+=("-var \"output_name=$vm_name_prefix\"")
     win10_args+=("-var \"output_directory=$base_out_location\"")
