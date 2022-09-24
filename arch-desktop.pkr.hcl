@@ -9,6 +9,7 @@ source "hyperv-vmcx" "arch-desktop" {
   ssh_username         = var.username
   switch_name          = var.hyperv_switchname
   vm_name              = "${var.arch_vm_name}-desktop"
+  vlan_id              = var.hyperv_vlan_id
 }
 
 build {

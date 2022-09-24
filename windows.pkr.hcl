@@ -17,6 +17,7 @@ source "hyperv-iso" "windows" {
   secondary_iso_images             = ["${path.root}/windows/iso/floppy.iso"]
   shutdown_command                 = "shutdown /s /f /t 0"
   switch_name                      = var.hyperv_switchname
+  vlan_id                          = var.hyperv_vlan_id
   vm_name                          = var.windows_vm_name
   winrm_password                   = var.password
   winrm_timeout                    = "4h"

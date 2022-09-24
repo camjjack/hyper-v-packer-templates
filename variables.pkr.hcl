@@ -15,12 +15,11 @@ variable "disk_size" {
 
 variable "hyperv_switchname" {
   type    = string
-  default = "WSL"
+  default = "Default External"
 }
-
-variable "initrd" {
-  type    = string
-  default = "/casper/initrd"
+variable "hyperv_vlan_id" {
+  type    = number
+  default = null
 }
 
 variable "iso_checksum_type" {
@@ -84,10 +83,6 @@ variable "vm_name" {
   default = "ubuntu"
 }
 
-variable "vmlinuz" {
-  type    = string
-  default = "/casper/vmlinuz"
-}
 variable "input_directory" {
   type    = string
   default = "./output/ubuntu-20.04/"

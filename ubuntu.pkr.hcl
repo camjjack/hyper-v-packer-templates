@@ -8,7 +8,7 @@ packer {
 }
 
 source "hyperv-iso" "ubuntu" {
-  boot_command         = ["<esc><wait1>", "set gfxpayload=keep<enter>", "linux /casper/vmlinuz quiet autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\"  ---<enter>", "initrd /casper/initrd<enter>", "boot<enter>"]
+  boot_command         = ["c", "linux /casper/vmlinuz quiet autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ <enter>", "initrd /casper/initrd<enter>", "boot<enter>"]
   boot_wait            = "5s"
   communicator         = "ssh"
   cpus                 = var.cpu
@@ -36,6 +36,7 @@ source "hyperv-iso" "ubuntu" {
   ssh_username     = var.username
   switch_name      = var.hyperv_switchname
   vm_name          = var.vm_name
+  vlan_id          = var.hyperv_vlan_id
 }
 
 source "virtualbox-iso" "ubuntu" {
