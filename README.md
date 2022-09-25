@@ -32,7 +32,7 @@ The following box OS's are supported:
    * Arch Linus x64
    * VyOS x64
 ## Usage
-### Ubuntu LTS x64 on Windows host
+### Ubuntu LTS x64, Arch Linux x64 and VyOS on Windows host
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
@@ -47,6 +47,12 @@ A default build can be run like this:
 ```
 
 ### Windows 11 x64 on Windows host
+
+This requires a modification to the hyper-v packer plugin that hasn't been merged yet. To make this work you need to checkout 
+the `enable-tpm` branch from https://github.com/camjjack/packer-plugin-hyperv and use that instead of the default plugin. Then uncomment the following line in `windows.pkr.hcl`:
+    
+    //enable_tpm                       = true
+
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
