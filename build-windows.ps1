@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    Builds Packer Windows 10 boxes for Hyper-V
+    Builds Packer Windows boxes for Hyper-V
 .DESCRIPTION
-    Wrapper around packer and some build configurations to automate the building process for Windows 10 boxes.
+    Wrapper around packer and some build configurations to automate the building process for Windows boxes.
 .PARAMETER outputNamePrefix
     The base name for the output directories.
 .PARAMETER vmNamePrefix
@@ -29,18 +29,18 @@
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
-param([string]$outputNamePrefix = "output-windows-10",
-      [string]$vmNamePrefix = "windows-10",
-      [string]$cpus = "2",
-      [string]$ramSize = "4096",
-      [string]$diskSize = "200000",
-      [string]$username = "vagrant",
-      [switch]$disableVirtualization = $false,
-      [switch]$clean = $false,
-      [switch]$force = $false,
-      [switch]$debug = $false,
-      [switch]$verbose = $false,
-      [switch]$vagrantAdd = $false)
+param([string]$outputNamePrefix = "output-windows",
+    [string]$vmNamePrefix = "windows",
+    [string]$cpus = "2",
+    [string]$ramSize = "4096",
+    [string]$diskSize = "200000",
+    [string]$username = "vagrant",
+    [switch]$disableVirtualization = $false,
+    [switch]$clean = $false,
+    [switch]$force = $false,
+    [switch]$debug = $false,
+    [switch]$verbose = $false,
+    [switch]$vagrantAdd = $false)
 
 #### Configuration
 $packer_exe = "packer.exe"
@@ -68,14 +68,15 @@ if ($disableVirtualization) {
 }
 
 if ($verbose -or $debug) {
-    $env:PACKER_LOG=1
-    $env:PACKER_LOG_PATH=packer-log.txt
-} else {
-    $env:PACKER_LOG=0
-    $env:PACKER_LOG_PATH=''
+    $env:PACKER_LOG = 1
+    $env:PACKER_LOG_PATH = packer-log.txt
+}
+else {
+    $env:PACKER_LOG = 0
+    $env:PACKER_LOG_PATH = ''
 }
 
-if($Clean -or $force) {
+if ($Clean -or $force) {
     Write-Output -InputObject "Removing existing box files"
     $output_boxs = '{0}/*{1}*.box' -f $box_out_dir, $vmNamePrefix
     Get-ChildItem $output_boxs -Recurse | Remove-Item -Recurse -Force
@@ -83,7 +84,7 @@ if($Clean -or $force) {
     $output_dirs = '{0}*' -f $outputNamePrefix
     Get-ChildItem $output_dirs -Recurse | Remove-Item -Recurse -Force
     Remove-Item -Path $output_dirs -Recurse -Force
-    if($Clean) {
+    if ($Clean) {
         exit 0
     }
 }
@@ -93,38 +94,39 @@ Write-Output "Building floppy iso"
 if (-not $?) {
     Write-Error -Message "Building floppy iso failed"
     exit 1
-} else {
+}
+else {
     Write-Output "Sucessfully built floppy iso"
 }
 
 if (-not (Test-Path $base_box_location)) {
-    Write-Output -InputObject "Starting packer build for Windows 10"
-    $win10_args = @('build')
-    $win10_args += '-var "vm_name={0}"' -f $vmNamePrefix
-    $win10_args += '-var "output_name={0}"' -f $vmNamePrefix
-    $win10_args += '-var "output_directory={0}"' -f $base_out_location
-    $win10_args += '--only=*hyperv-iso.windows'
+    Write-Output -InputObject "Starting packer build for Windows"
+    $win_args = @('build')
+    $win_args += '-var "vm_name={0}"' -f $vmNamePrefix
+    $win_args += '-var "output_name={0}"' -f $vmNamePrefix
+    $win_args += '-var "output_directory={0}"' -f $base_out_location
+    $win_args += '--only=*hyperv-iso.windows'
 
-    $win10_args += $base_args
-    $win10_args += "."
+    $win_args += $base_args
+    $win_args += "."
 
-    $build_server = Start-Process -FilePath $packer_exe -ArgumentList $win10_args -NoNewWindow -PassThru -Wait
+    $build_server = Start-Process -FilePath $packer_exe -ArgumentList $win_args -NoNewWindow -PassThru -Wait
 
     if ($build_server.ExitCode -ne 0) {
-        Write-Error -Message "Failed to build Windows 10 with packer"
+        Write-Error -Message "Failed to build Windows with packer"
         exit 1
     }
 
     if ($vagrantAdd) {
-        $win10_vagrant_args = @('box')
-        $win10_vagrant_args += 'add'
-        if($force) {
-            $win10_vagrant_args += '--force'
+        $win_vagrant_args = @('box')
+        $win_vagrant_args += 'add'
+        if ($force) {
+            $win_vagrant_args += '--force'
         }
-        $win10_vagrant_args += '--name "{0}"' -f $vmNamePrefix
-        $win10_vagrant_args += $base_box_location
+        $win_vagrant_args += '--name "{0}"' -f $vmNamePrefix
+        $win_vagrant_args += $base_box_location
 
-        $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $win10_vagrant_args -NoNewWindow -PassThru -Wait
+        $add_server = Start-Process -FilePath $vagrant_exe -ArgumentList $win_vagrant_args -NoNewWindow -PassThru -Wait
 
         if ($add_server.ExitCode -ne 0) {
             Write-Error -Message "Failed to add generated box file to Vagrant"
