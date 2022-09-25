@@ -1,0 +1,40 @@
+---
+
+name: Packer
+
+on:
+  push:
+
+jobs:
+  packer:
+    runs-on: ubuntu-latest
+    name: packer
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
+      - name: Creating output directories
+        run: mkdir -p output/{ubuntu,ubuntu-desktop,arch}
+
+      - name: Creating windows floppy.iso
+        run: mkdir -p windows/iso && touch windows/iso/floppy.iso
+
+      # validate templates
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: .
+
+  powershell-test:
+    name: powershell-test
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Build floppy
+        shell: powershell
+        run: ./windows/scripts/mkiso.ps1 -Source './windows/answer_files/autounattend.xml', './windows/floppy/' -OutPath './windows/iso/floppy.iso' -Force | Should -Be $true
+        

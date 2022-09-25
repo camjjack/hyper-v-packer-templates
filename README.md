@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/camjjack/camjjack/_apis/build/status/camjjack.hyper-v-packer-templates?branchName=master)](https://dev.azure.com/camjjack/camjjack/_build/latest?definitionId=2&branchName=master)
+![Build Status](https://github.com/camjjack/hyper-v-packer-templates/actions/workflows/main.yml/badge.svg)
 
 # Hyper-V packer templates
 

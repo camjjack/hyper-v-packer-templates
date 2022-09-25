@@ -7,8 +7,8 @@ source "hyperv-iso" "windows" {
   enable_mac_spoofing              = true
   enable_secure_boot               = true
   enable_virtualization_extensions = var.windows_disable_virtualization ? false : true
-  // Requires https://github.com/hashicorp/packer-plugin-hyperv/pull/56 to be merged, or checkout camjjack:enable-tpm and use.
-  //enable_tpm                       = true
+  # Requires https://github.com/hashicorp/packer-plugin-hyperv/pull/56 to be merged, or checkout camjjack:enable-tpm and use.
+  # enable_tpm                       = true
   generation                       = 2
   guest_additions_mode             = "disable"
   iso_checksum                     = "${var.iso_checksum_type}:${var.windows_iso_checksum}"
