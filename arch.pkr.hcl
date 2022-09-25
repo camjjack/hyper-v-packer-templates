@@ -27,6 +27,7 @@ source "hyperv-iso" "arch" {
   ssh_username     = var.username
   switch_name      = var.hyperv_switchname
   vm_name          = var.arch_vm_name
+  vlan_id          = var.hyperv_vlan_id
 }
 
 build {

@@ -1,16 +1,16 @@
 <#
 .SYNOPSIS
-    Builds Packer Ubuntu 20.04 boxes for Hyper-V
+    Builds Packer Ubuntu LTS boxes for Hyper-V
 .DESCRIPTION
     Wrapper around packer and some build configurations to automate the building process for three boxes.
-      1) Base Ubuntu 20.04 server
-      2) Ubuntu 20.04 Desktop
-      3) Ubuntu 20.04 Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
+      1) Base Ubuntu LTS server
+      2) Ubuntu LTS Desktop
+      3) Ubuntu LTS Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
       4) Base Arch Linux
       5) Arch Linux with xorg and enhanced session support
     Also provides command line configuration for these builds.
-.PARAMETER outputNamePrefix
-    The base name for the output directories. This is used to pass to following packer builds to generate the desktop and enhanced session boxes.
+.PARAMETER outputDir
+    The base name for the output directories.
 .PARAMETER vmNamePrefix
     The base name for vm's that are created.
 .PARAMETER cpus
@@ -25,6 +25,8 @@
     Instructs the build process to just build a server os not the desktop boxes.
 .PARAMETER dontBuildArch
     Instructs the build process to not build the arch boxes.
+.PARAMETER dontBuildVyos
+    Instructs the build process to not build the VyOS box.
 .PARAMETER clean
     Cleans up all the artifacts of the build process.
 .PARAMETER force
@@ -37,19 +39,20 @@
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
-param([string]$outputNamePrefix = "output-ubuntu-20.04",
-      [string]$vmNamePrefix = "ubuntu-20.04",
-      [string]$cpus = "2",
-      [string]$ramSize = "4096",
-      [string]$diskSize = "200000",
-      [string]$username = "vagrant",
-      [switch]$dontBuildDesktop = $false,
-      [switch]$dontBuildArch = $false,
-      [switch]$clean = $false,
-      [switch]$force = $false,
-      [switch]$debug = $false,
-      [switch]$verbose = $false,
-      [switch]$vagrantAdd = $false)
+param([string]$outputDir = "output",
+    [string]$vmNamePrefix = "ubuntu",
+    [string]$cpus = "2",
+    [string]$ramSize = "4096",
+    [string]$diskSize = "200000",
+    [string]$username = "vagrant",
+    [switch]$dontBuildDesktop = $false,
+    [switch]$dontBuildArch = $false,
+    [switch]$dontBuildVyos = $false,
+    [switch]$clean = $false,
+    [switch]$force = $false,
+    [switch]$debug = $false,
+    [switch]$verbose = $false,
+    [switch]$vagrantAdd = $false)
 
 #### Configuration
 $packer_exe = 'packer.exe'
@@ -57,11 +60,11 @@ $vagrant_exe = 'vagrant.exe'
 $box_out_dir = 'dist'
 
 # Vm names and locations based on the prefixes given as a parameter.
-$base_out_location = './{0}/' -f $outputNamePrefix
-$desktop_out_location = './{0}-desktop/' -f $outputNamePrefix
+$base_out_location = './{0}/{1}' -f $outputDir, $vmNamePrefix
+$desktop_out_location = '{0}-desktop/' -f $base_out_location
 $desktop_vm_name = '{0}-desktop' -f $vmNamePrefix
-$desktop_hvsocket_out_location = '{0}-desktop-hvsocket' -f $outputNamePrefix
-$enhanced_out_location = './{0}-enhanced/' -f $outputNamePrefix
+$desktop_hvsocket_out_location = '{0}-desktop-hvsocket' -f $base_out_location
+$enhanced_out_location = './{0}-enhanced/' -f $base_out_location
 $enhanced_vm_name = '{0}-enhanced' -f $vmNamePrefix
 
 # Box file location based on the names given as a paramter
@@ -70,6 +73,7 @@ $desktop_box_location = './{0}/hyperv-vmcx-{1}-desktop.box' -f $box_out_dir, $vm
 $enhanced_box_location = './{0}/hyperv-vmcx-{1}-enhanced.box' -f $box_out_dir, $vmNamePrefix
 $arch_box_location = './{0}/hyperv-iso-arch.box' -f $box_out_dir
 $arch_desktop_box_location = './{0}/hyperv-vmcx-arch-desktop.box' -f $box_out_dir
+$vyos_box_location = './{0}/hyperv-iso-vyos.box' -f $box_out_dir
 
 #### End configuration
 
@@ -84,23 +88,23 @@ if ($debug) {
     $base_args += '--on-error=ask'
 }
 if ($debug -or $verbose) {
-    $env:PACKER_LOG=1
-    $env:PACKER_LOG_PATH='packer-log.txt'
+    $env:PACKER_LOG = 1
+    $env:PACKER_LOG_PATH = 'packer-log.txt'
 }
 
 # base parameter arguments to be used for all vagrant add commands
-$vagrant_add_args =  @('box')
+$vagrant_add_args = @('box')
 $vagrant_add_args += 'add'
 
-if($Clean -or $force) {
+if ($Clean -or $force) {
     Write-Output -InputObject "Removing existing box files"
-    $output_boxs = '{0}/*{1}*.box' -f $box_out_dir, $vmNamePrefix
+    $output_boxs = '{0}/hyperv-*.box' -f $box_out_dir
     Get-ChildItem $output_boxs -Recurse | Remove-Item -Recurse -Force
     Write-Output -InputObject "Removing existing build artivacts"
-    $output_dirs = '{0}*' -f $outputNamePrefix
+    $output_dirs = '{0}*' -f $outputDir
     Get-ChildItem $output_dirs -Recurse | Remove-Item -Recurse -Force
     Remove-Item -Path $output_dirs -Recurse -Force
-    if($Clean) {
+    if ($Clean) {
         exit 0
     }
 }
@@ -123,8 +127,11 @@ if (-not (Test-Path $base_box_location)) {
         exit 1
     }
 }
+else {
+    Write-Output -InputObject "Skipping build for Ubuntu server"
+}
 
-if($dontBuildDesktop) {
+if ($dontBuildDesktop) {
     Write-Output -InputObject "Not building desktop images. We are done"
     exit 0
 }
@@ -134,7 +141,7 @@ if (-not (Test-Path $desktop_box_location)) {
     $desktop_args = @('build')
     # VM name has to match that of the existing vmcx. We could import, rename and export like we do for the enhanced box below, but that seems
     # like a lot of time for little gain assuming that you'll want to use the enhanced one anyway for its awesomness
-    $desktop_args += '-var "vm_name={0}"' -f $vmNamePrefix
+    $desktop_args += '-var "vm_name={0}"' -f $desktop_vm_name
     $desktop_args += '-var "output_name={0}"' -f $desktop_vm_name
     $desktop_args += '-var "output_directory={0}"' -f $desktop_out_location
     $desktop_args += '-var "input_directory={0}"' -f $base_out_location
@@ -149,6 +156,9 @@ if (-not (Test-Path $desktop_box_location)) {
         exit 1
     }
 }
+else {
+    Write-Output -InputObject "Skipping build for Ubuntu desktop"
+}
 
 $version = [environment]::OSVersion.Version
 if ($version.Major -ilt 10 -or $version.Build -ilt 17063) {
@@ -160,7 +170,7 @@ if (-not (Test-Path $enhanced_box_location)) {
     $input_dir = Join-Path -Path $desktop_hvsocket_out_location -ChildPath $enhanced_vm_name
     if (-not (Test-Path $input_dir)) {
         Write-Output -InputObject "Changing desktop vm to use hvsocket for enhanced session transport"
-        & "./setup-enhanced-transport-type.ps1" -Path $desktop_out_location -OutPath $desktop_hvsocket_out_location -VmName $vmNamePrefix-desktop -OutVmName $enhanced_vm_name
+        & "./setup-enhanced-transport-type.ps1" -Path $desktop_out_location -OutPath $desktop_hvsocket_out_location -VmName $desktop_vm_name -OutVmName $enhanced_vm_name
         if (-not $?) {
             Write-Error -Message "setup-enhanced-transport-type failed"
             exit 1
@@ -185,6 +195,9 @@ if (-not (Test-Path $enhanced_box_location)) {
     }
 
 }
+else {
+    Write-Output -InputObject "Skipping build for Ubuntu enhanced desktop"
+}
 
 if ($vagrantAdd) {
     $enhanced_vagrant_args = $vagrant_add_args
@@ -199,7 +212,7 @@ if ($vagrantAdd) {
     }
 }
 
-if($dontBuildArch) {
+if ($dontBuildArch) {
     Write-Output -InputObject "Not building Arch images. We are done"
     exit 0
 }
@@ -219,13 +232,17 @@ if (-not (Test-Path $arch_box_location)) {
         exit 1
     }
 }
+else {
+    Write-Output -InputObject "Skipping build for Arch"
+}
 
 if (-not (Test-Path $arch_desktop_box_location)) {
     
     $version = [environment]::OSVersion.Version
     if ($version.Major -ilt 10 -or $version.Build -ilt 17063) {
         Write-Output -InputObject "Host is not on Build 17063 or greater so skipping enhanced mode build"
-    } else {
+    }
+    else {
         Write-Output -InputObject "Starting packer build for Arch desktop"
         $desktop_args = @('build')
         # VM name has to match that of the existing vmcx. We could import, rename and export like we do for the enhanced box below, but that seems
@@ -255,3 +272,37 @@ if (-not (Test-Path $arch_desktop_box_location)) {
     }
 }
 
+
+
+if ($dontBuildVyos) {
+    Write-Output -InputObject "Not building VyOS image. We are done"
+    exit 0
+}
+
+if (-not (Test-Path $vyos_box_location)) {
+    Write-Output -InputObject "Starting packer build for VyOS"
+    $vyos_args = @('build')
+    $vyos_args += '--only=hyperv-iso.vyos'
+
+    $vyos_args += $base_args
+    $ip = Get-NetIPAddress -AddressFamily IPV4 -InterfaceAlias "vEthernet (WSL)"
+    if ($ip.IPAddress) {
+        $ip_parts = $ip.IPAddress.Split('.')
+        $base_ip = $ip_parts[0] + '.' + $ip_parts[1] + '.' + ([Int]$ip_parts[2] + 1) + '.'
+        $vyos_args += '-var "vyos_ip={0}1"' -f $base_ip
+        $vyos_args += '-var "vyos_host_ip={0}"' -f $ip.IPAddress
+        $vyos_args += '-var "vyos_subnet_range={0}.{1}.{2}.0/20"' -f $ip_parts[0], $ip_parts[1], $ip_parts[2]
+        $vyos_args += '-var "vyos_dhcp_start={0}10"' -f $base_ip
+        $vyos_args += '-var "vyos_dhcp_start={0}200"' -f $base_ip
+    }
+    $vyos_args += '.'
+    $build_vyos = Start-Process -FilePath $packer_exe -ArgumentList $vyos_args -NoNewWindow -PassThru -Wait
+
+    if ($build_vyos.ExitCode -ne 0) {
+        Write-Error -Message "Failed to build VyOS image with packer"
+        exit 1
+    }
+}
+else {
+    Write-Output -InputObject "Skipping build for VyOS"
+}

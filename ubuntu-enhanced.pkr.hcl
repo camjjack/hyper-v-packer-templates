@@ -8,6 +8,7 @@ source "hyperv-vmcx" "ubuntu-enhanced" {
   ssh_password         = var.password
   ssh_username         = var.username
   switch_name          = var.hyperv_switchname
+  vlan_id              = var.hyperv_vlan_id
   vm_name              = "${var.vm_name}-enhanced"
 }
 

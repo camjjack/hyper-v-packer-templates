@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/camjjack/camjjack/_apis/build/status/camjjack.hyper-v-packer-templates?branchName=master)](https://dev.azure.com/camjjack/camjjack/_build/latest?definitionId=2&branchName=master)
+![Build Status](https://github.com/camjjack/hyper-v-packer-templates/actions/workflows/main.yml/badge.svg)
 
 # Hyper-V packer templates
 
@@ -25,9 +25,14 @@ So the goals for this project are simple:
 1. Packer
 1. Virtualbox
 
+## Supported packer boxes
+The following box OS's are supported:
+   * Ubuntu LTS x64
+   * Windows 11 x64
+   * Arch Linus x64
+   * VyOS x64
 ## Usage
-
-### Ubuntu 20.04 x64 on Windows host
+### Ubuntu LTS x64, Arch Linux x64 and VyOS on Windows host
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
@@ -41,7 +46,13 @@ A default build can be run like this:
 .\build.ps1
 ```
 
-### Windows 10 x64 on Windows host
+### Windows 11 x64 on Windows host
+
+This requires a modification to the hyper-v packer plugin that hasn't been merged yet. To make this work you need to checkout 
+the `enable-tpm` branch from https://github.com/camjjack/packer-plugin-hyperv and use that instead of the default plugin. Then uncomment the following line in `windows.pkr.hcl`:
+    
+    //enable_tpm                       = true
+
 A PowerShell build script has been created to handle build and configuration for the vagrant boxes.
 
 From a PowerShell command prompt in the project root:
@@ -55,7 +66,7 @@ A default build can be run like this:
 .\build-windows.ps1
 ```
 
-### Ubuntu 20.04 x64 on Linux host
+### Ubuntu LTS x64 on Linux host
 A bash script has been created to handle build and configuration for the vagrant boxes.
 
 ```
@@ -68,7 +79,7 @@ A default build can be run like this:
 ./build.sh
 ```
 
-### Windows 10 x64 on Linux host
+### Windows 11 x64 on Linux host
 A bash script has been created to handle build and configuration for the vagrant boxes.
 
 ```
@@ -81,8 +92,6 @@ A default build can be run like this:
 ./build-windows.sh
 ```
 
-## Supported packer boxes
-In keeping with my project goals above, Ubuntu 20.04 x64 and Windows 10 x64 are the only supported box OS's at this stage.
 
 ## Troubleshooting
 The build script has a -debug option which sets some packer options to aid in debugging faulty templates. Start with the generated log file: packer-log.txt

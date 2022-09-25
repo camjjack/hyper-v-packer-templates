@@ -15,12 +15,11 @@ variable "disk_size" {
 
 variable "hyperv_switchname" {
   type    = string
-  default = "WSL"
+  default = "Default External"
 }
-
-variable "initrd" {
-  type    = string
-  default = "/casper/initrd"
+variable "hyperv_vlan_id" {
+  type    = number
+  default = null
 }
 
 variable "iso_checksum_type" {
@@ -30,12 +29,12 @@ variable "iso_checksum_type" {
 
 variable "iso_checksum_url" {
   type    = string
-  default = "https://releases.ubuntu.com/20.04/SHA256SUMS"
+  default = "https://releases.ubuntu.com/22.04/SHA256SUMS"
 }
 
 variable "iso_url" {
   type    = string
-  default = "https://releases.ubuntu.com/20.04/ubuntu-20.04.3-live-server-amd64.iso"
+  default = "https://releases.ubuntu.com/22.04/ubuntu-22.04.1-live-server-amd64.iso"
 }
 
 variable "keyboard_layout" {
@@ -50,7 +49,7 @@ variable "locale" {
 
 variable "output_directory" {
   type    = string
-  default = "./output/ubuntu-20.04/"
+  default = "./output/ubuntu/"
 }
 
 variable "output_name" {
@@ -84,17 +83,14 @@ variable "vm_name" {
   default = "ubuntu"
 }
 
-variable "vmlinuz" {
-  type    = string
-  default = "/casper/vmlinuz"
-}
 variable "input_directory" {
   type    = string
-  default = "./output/ubuntu-20.04/"
+  default = "./output/ubuntu/"
 }
+
 variable "input_name" {
   type    = string
-  default = "ubuntu-20.04"
+  default = "ubuntu"
 }
 
 variable "timezone_region" {

@@ -14,17 +14,17 @@
     The name for the resultant virtual machine.
 #>
 param([string]$Path,
-      [string]$OutPath,
-      [string]$VmName,
-      [string]$OutVmName)
+    [string]$OutPath,
+    [string]$VmName,
+    [string]$OutVmName)
 
 $vmcx_path = Join-Path -Path $Path -ChildPath "Virtual Machines\*.vmcx"
 $vmcx = Get-Item -Path $vmcx_path
 
 $VirtualHarddisksPath = Join-Path -Path $OutPath -ChildPath 'Virtual Hard Disks'
 
-Get-VM -Name $VmName
-if (-not $?) {
+$vm = Get-VM -Name $VmName
+if (-not $vm) {
     Write-Output -InputObject "Importing Desktop VM"
     Import-VM -Path $vmcx -VirtualMachinePath $OutPath -VhdDestinationPath $VirtualHarddisksPath -Copy
     if (-not $?) {

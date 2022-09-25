@@ -6,8 +6,8 @@ log_path=packer-log.txt
 box_out_dir="dist"
 
 
-output_name_prefix="output-windows-10"
-vm_name_prefix="windows-10"
+output_name_prefix="output-windows"
+vm_name_prefix="windows"
 cpus="2"
 ram_size="4096"
 disk_size="200000"
@@ -92,15 +92,15 @@ base_box_location="$box_out_dir/virtualbox-iso-$vm_name_prefix.box"
 if [ ! -f $base_box_location ]; then
     echo "Building base image"
 
-    win10_args=("-var \"vm_name=$vm_name_prefix\"")
-    win10_args+=("-var \"output_name=$vm_name_prefix\"")
-    win10_args+=("-var \"output_directory=$base_out_location\"")
+    win_args=("-var \"vm_name=$vm_name_prefix\"")
+    win_args+=("-var \"output_name=$vm_name_prefix\"")
+    win_args+=("-var \"output_directory=$base_out_location\"")
 
     args=("packer")
     args+=("build")
     args+=("--only=*virtualbox-iso.windows")
     args+=("${base_args[@]}")
-    args+=("${win10_args[@]}")
+    args+=("${win_args[@]}")
     args+=(".")
     echo ${args[@]}
     export TMPDIR=/var/tmp/

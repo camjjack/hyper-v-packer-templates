@@ -7,7 +7,8 @@ source "hyperv-iso" "windows" {
   enable_mac_spoofing              = true
   enable_secure_boot               = true
   enable_virtualization_extensions = var.windows_disable_virtualization ? false : true
-  enable_tpm                       = true
+  # Requires https://github.com/hashicorp/packer-plugin-hyperv/pull/56 to be merged, or checkout camjjack:enable-tpm and use.
+  # enable_tpm                       = true
   generation                       = 2
   guest_additions_mode             = "disable"
   iso_checksum                     = "${var.iso_checksum_type}:${var.windows_iso_checksum}"
@@ -17,6 +18,7 @@ source "hyperv-iso" "windows" {
   secondary_iso_images             = ["${path.root}/windows/iso/floppy.iso"]
   shutdown_command                 = "shutdown /s /f /t 0"
   switch_name                      = var.hyperv_switchname
+  vlan_id                          = var.hyperv_vlan_id
   vm_name                          = var.windows_vm_name
   winrm_password                   = var.password
   winrm_timeout                    = "4h"
