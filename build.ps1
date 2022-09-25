@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Builds Packer Ubuntu 20.04 boxes for Hyper-V
+    Builds Packer Ubuntu LTS boxes for Hyper-V
 .DESCRIPTION
     Wrapper around packer and some build configurations to automate the building process for three boxes.
-      1) Base Ubuntu 20.04 server
-      2) Ubuntu 20.04 Desktop
-      3) Ubuntu 20.04 Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
+      1) Base Ubuntu LTS server
+      2) Ubuntu LTS Desktop
+      3) Ubuntu LTS Desktop with enhanced session support, see: https://github.com/Microsoft/linux-vm-tools/wiki/Onboarding:-Ubuntu
       4) Base Arch Linux
       5) Arch Linux with xorg and enhanced session support
     Also provides command line configuration for these builds.
@@ -37,19 +37,19 @@
 .PARAMETER vagrantAdd
     If set will add the build box files to vagrant. WARNING: current behaivior is to -force add these boxes as its assumed these boxes were not created corectly the first time and you are running it again.
 #>
-param([string]$outputNamePrefix = "output-ubuntu-20.04",
-      [string]$vmNamePrefix = "ubuntu-20.04",
-      [string]$cpus = "2",
-      [string]$ramSize = "4096",
-      [string]$diskSize = "200000",
-      [string]$username = "vagrant",
-      [switch]$dontBuildDesktop = $false,
-      [switch]$dontBuildArch = $false,
-      [switch]$clean = $false,
-      [switch]$force = $false,
-      [switch]$debug = $false,
-      [switch]$verbose = $false,
-      [switch]$vagrantAdd = $false)
+param([string]$outputNamePrefix = "output/ubuntu",
+    [string]$vmNamePrefix = "ubuntu",
+    [string]$cpus = "2",
+    [string]$ramSize = "4096",
+    [string]$diskSize = "200000",
+    [string]$username = "vagrant",
+    [switch]$dontBuildDesktop = $false,
+    [switch]$dontBuildArch = $false,
+    [switch]$clean = $false,
+    [switch]$force = $false,
+    [switch]$debug = $false,
+    [switch]$verbose = $false,
+    [switch]$vagrantAdd = $false)
 
 #### Configuration
 $packer_exe = 'packer.exe'
@@ -84,15 +84,15 @@ if ($debug) {
     $base_args += '--on-error=ask'
 }
 if ($debug -or $verbose) {
-    $env:PACKER_LOG=1
-    $env:PACKER_LOG_PATH='packer-log.txt'
+    $env:PACKER_LOG = 1
+    $env:PACKER_LOG_PATH = 'packer-log.txt'
 }
 
 # base parameter arguments to be used for all vagrant add commands
-$vagrant_add_args =  @('box')
+$vagrant_add_args = @('box')
 $vagrant_add_args += 'add'
 
-if($Clean -or $force) {
+if ($Clean -or $force) {
     Write-Output -InputObject "Removing existing box files"
     $output_boxs = '{0}/*{1}*.box' -f $box_out_dir, $vmNamePrefix
     Get-ChildItem $output_boxs -Recurse | Remove-Item -Recurse -Force
@@ -100,7 +100,7 @@ if($Clean -or $force) {
     $output_dirs = '{0}*' -f $outputNamePrefix
     Get-ChildItem $output_dirs -Recurse | Remove-Item -Recurse -Force
     Remove-Item -Path $output_dirs -Recurse -Force
-    if($Clean) {
+    if ($Clean) {
         exit 0
     }
 }
@@ -124,7 +124,7 @@ if (-not (Test-Path $base_box_location)) {
     }
 }
 
-if($dontBuildDesktop) {
+if ($dontBuildDesktop) {
     Write-Output -InputObject "Not building desktop images. We are done"
     exit 0
 }
@@ -199,7 +199,7 @@ if ($vagrantAdd) {
     }
 }
 
-if($dontBuildArch) {
+if ($dontBuildArch) {
     Write-Output -InputObject "Not building Arch images. We are done"
     exit 0
 }
@@ -225,7 +225,8 @@ if (-not (Test-Path $arch_desktop_box_location)) {
     $version = [environment]::OSVersion.Version
     if ($version.Major -ilt 10 -or $version.Build -ilt 17063) {
         Write-Output -InputObject "Host is not on Build 17063 or greater so skipping enhanced mode build"
-    } else {
+    }
+    else {
         Write-Output -InputObject "Starting packer build for Arch desktop"
         $desktop_args = @('build')
         # VM name has to match that of the existing vmcx. We could import, rename and export like we do for the enhanced box below, but that seems

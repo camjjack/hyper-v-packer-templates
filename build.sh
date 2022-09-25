@@ -7,7 +7,7 @@ box_out_dir="dist"
 
 
 output_name_prefix="output-ubuntu"
-vm_name_prefix="ubuntu-20.04"
+vm_name_prefix="ubuntu"
 cpus="2"
 ram_size="4096"
 disk_size="200000"

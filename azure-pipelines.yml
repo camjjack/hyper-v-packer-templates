@@ -12,7 +12,7 @@ jobs:
       ./install-latest-packer.sh
     displayName: 'Install packer'
 
-  - script: mkdir output-ubuntu-20.04
+  - script: mkdir output-ubuntu
     displayName: 'faking ubuntu server output for validation to succeed'
 
   - script: mkdir -p windows/iso && touch windows/iso/floppy.iso
