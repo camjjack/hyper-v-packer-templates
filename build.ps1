@@ -25,6 +25,8 @@
     Instructs the build process to just build a server os not the desktop boxes.
 .PARAMETER dontBuildArch
     Instructs the build process to not build the arch boxes.
+.PARAMETER dontBuildVyos
+    Instructs the build process to not build the VyOS box.
 .PARAMETER clean
     Cleans up all the artifacts of the build process.
 .PARAMETER force
@@ -45,6 +47,7 @@ param([string]$outputNamePrefix = "output/ubuntu",
     [string]$username = "vagrant",
     [switch]$dontBuildDesktop = $false,
     [switch]$dontBuildArch = $false,
+    [switch]$dontBuildVyos = $false,
     [switch]$clean = $false,
     [switch]$force = $false,
     [switch]$debug = $false,
@@ -70,6 +73,7 @@ $desktop_box_location = './{0}/hyperv-vmcx-{1}-desktop.box' -f $box_out_dir, $vm
 $enhanced_box_location = './{0}/hyperv-vmcx-{1}-enhanced.box' -f $box_out_dir, $vmNamePrefix
 $arch_box_location = './{0}/hyperv-iso-arch.box' -f $box_out_dir
 $arch_desktop_box_location = './{0}/hyperv-vmcx-arch-desktop.box' -f $box_out_dir
+$vyos_box_location = './{0}/hyperv-iso-vyos.box' -f $box_out_dir
 
 #### End configuration
 
@@ -256,3 +260,25 @@ if (-not (Test-Path $arch_desktop_box_location)) {
     }
 }
 
+
+
+if ($dontBuildVyos) {
+    Write-Output -InputObject "Not building VyOS image. We are done"
+    exit 0
+}
+
+if (-not (Test-Path $vyos_box_location)) {
+    Write-Output -InputObject "Starting packer build for VyOS"
+    $vyos_args = @('build')
+    $vyos_args += '--only=hyperv-iso.vyos'
+
+    $vyos_args += $base_args
+    $vyos_args += '.'
+
+    $build_vyos = Start-Process -FilePath $packer_exe -ArgumentList $vyos_args -NoNewWindow -PassThru -Wait
+
+    if ($build_vyos.ExitCode -ne 0) {
+        Write-Error -Message "Failed to build VyOS image with packer"
+        exit 1
+    }
+}
