@@ -273,12 +273,24 @@ if (-not (Test-Path $vyos_box_location)) {
     $vyos_args += '--only=hyperv-iso.vyos'
 
     $vyos_args += $base_args
+    $ip = Get-NetIPAddress -AddressFamily IPV4 -InterfaceAlias "vEthernet (WSL)"
+    if ($ip.IPAddress) {
+        $ip_parts = $ip.IPAddress.Split('.')
+        $base_ip = $ip_parts[0] + '.' + $ip_parts[1] + '.' + ([Int]$ip_parts[2] + 1) + '.'
+        $vyos_args += '-var "vyos_ip={0}1"' -f $base_ip
+        $vyos_args += '-var "vyos_host_ip={0}"' -f $ip.IPAddress
+        $vyos_args += '-var "vyos_subnet_range={0}.{1}.{2}.0/20"' -f $ip_parts[0], $ip_parts[1], $ip_parts[2]
+        $vyos_args += '-var "vyos_dhcp_start={0}10"' -f $base_ip
+        $vyos_args += '-var "vyos_dhcp_start={0}200"' -f $base_ip
+    }
     $vyos_args += '.'
-
     $build_vyos = Start-Process -FilePath $packer_exe -ArgumentList $vyos_args -NoNewWindow -PassThru -Wait
 
     if ($build_vyos.ExitCode -ne 0) {
         Write-Error -Message "Failed to build VyOS image with packer"
         exit 1
     }
+}
+else {
+    Write-Output -InputObject "Skipping build for VyOS"
 }

@@ -28,7 +28,7 @@ source "hyperv-iso" "vyos" {
     # What would you like to name this image?
     "<enter><wait3>",
     # Which one should I copy to sda?
-    "<enter>",
+    "<enter><wait3>",
     # Enter password for user vyos:
     "${var.password}<enter>",
     # Retype paswword for user vyos:
@@ -38,7 +38,7 @@ source "hyperv-iso" "vyos" {
     # Reboot
     "reboot<enter><wait3>y<enter>",
     # Wait for reboot
-    "<wait30>",
+    "<wait40>",
     # Login
     "vyos<enter><wait3>",
     "${var.password}<enter><wait3>",
@@ -67,12 +67,13 @@ source "hyperv-iso" "vyos" {
   iso_checksum         = var.vyos_iso_checksum
   iso_url              = var.vyos_iso_url
   memory               = var.vyos_ram_size
-  output_directory     = var.output_directory
+  output_directory     = var.vyos_output_directory
   shutdown_command     = "echo '${var.username}' | sudo -S -E shutdown -P now"
+  ssh_host             = var.vyos_ip
   ssh_password         = var.password
   ssh_timeout          = "4h"
   ssh_username         = var.vyos_username
-  switch_name          = var.hyperv_switchname
+  switch_name          = var.vyos_hyperv_switchname
   vm_name              = var.vyos_vm_name
 }
 
